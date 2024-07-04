@@ -1,4 +1,4 @@
-package com.qrhunt
+package com.qrhunt.qrhunt
 
 import android.app.Application
 import android.content.res.Configuration
