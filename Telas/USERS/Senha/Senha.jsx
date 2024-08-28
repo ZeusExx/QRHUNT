@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { sendPasswordResetEmail } from "firebase/auth"; // Importe a função necessária para redefinir a senha
-import { auth } from '../../Firebase/config';
+import { sendPasswordResetEmail } from "firebase/auth"; 
+import { auth } from '../../../Firebase/config';
 
 const Senha = () => {
     const [email, setEmail] = useState('');
@@ -12,7 +12,6 @@ const Senha = () => {
     const handleResetPassword = async () => {
         setError(null);
         try {
-            // Chame a função para enviar o email de redefinição de senha
             await sendPasswordResetEmail(auth, email);
             Alert.alert("Email de redefinição enviado com sucesso!");
             setEmail('');
@@ -37,7 +36,7 @@ const Senha = () => {
                 <View style={styles.logoContainer}>
                     <Text style={styles.logo}>QRHUNT</Text>
                     <Image
-                        source={require('../../imgs/qrhunt.png')} // Substitua o caminho pelo seu arquivo de imagem
+                        source={require('../../../imgs/qrhunt.png')}
                         style={styles.logoImage}
                         resizeMode="contain"
                     />
@@ -65,6 +64,12 @@ const Senha = () => {
                         <Text style={styles.resetButtonText}>Redefinir Senha</Text>
                     </TouchableOpacity>
                 </View>
+                <TouchableOpacity
+                        style={styles.registerLink}
+                        onPress={() => navigation.navigate('Login')}
+                    >
+                        <Text style={styles.registerLinkText}>Voltar para o Login</Text>
+                    </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );
@@ -84,7 +89,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 20,
         elevation: 4,
-        marginVertical: 20, // Espaçamento vertical ao redor do formulário
+        marginVertical: 20, 
     },
     logoContainer: {
         alignItems: 'center',
@@ -94,11 +99,11 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 10,
-        color: '#000000', // Cor do texto do logo
+        color: '#000000', 
     },
     logoImage: {
-        width: 150, // Largura da imagem do logo
-        height: 150, // Altura da imagem do logo
+        width: 150, 
+        height: 150,
     },
     inputContainer: {
         marginBottom: 12,
@@ -133,6 +138,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#ffffff',
         fontWeight: 'bold',
+    },
+    registerLink: {
+        marginTop: 8,
+        alignItems: 'center',
+    },
+    registerLinkText: {
+        fontSize: 14,
+        color: '#000000',
+        textDecorationLine: 'underline',
     },
     error: {
         backgroundColor: 'rgba(255, 0, 0, 0.1)',

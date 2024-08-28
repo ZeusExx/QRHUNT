@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../Firebase/config';
+import { auth } from '../../../Firebase/config';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
-// Importe os ícones para mostrar/ocultar a senha
-import Mostra from '../../imgs/OnIcon.png';
-import Esconda from '../../imgs/OffIcon.png';
+import Mostra from '../../../imgs/OnIcon.png'
+import Esconda from '../../../imgs/OffIcon.png';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null); // State to store error messages
-    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+    const [error, setError] = useState(null); 
+    const [showPassword, setShowPassword] = useState(false); 
     const navigation = useNavigation();
 
     useEffect(() => {
         if (error) {
             const timer = setTimeout(() => {
                 setError(null);
-            }, 3000); // Clear the error after 3 seconds
+            }, 3000); 
 
-            return () => clearTimeout(timer); // Cleanup the timer on component unmount
+            return () => clearTimeout(timer); 
         }
     }, [error]);
 
@@ -63,7 +62,7 @@ const Login = () => {
             <View style={styles.logoContainer}>
                 <Text style={styles.logo}>QRHUNT</Text>
                 <Image
-                    source={require('../../imgs/qrhunt.png')} // Substitua o caminho pelo seu arquivo de imagem
+                    source={require('../../../imgs/qrhunt.png')}
                     style={styles.logoImage}
                     resizeMode="contain"
                 />
@@ -75,19 +74,19 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Email</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../imgs/email.png')} // Substitua pelo ícone desejado
+                            source={require('../../../imgs/email.png')} // Substitua pelo ícone desejado
                             style={styles.inputIcon}
                         />
                         <TextInput
                             style={styles.input}
                             placeholder="Digite seu email"
-                            placeholderTextColor="#555555" // Cor do placeholder
+                            placeholderTextColor="#555555"
                             value={email}
                             onChangeText={setEmail}
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
-                            textAlign="center" // Alinha o texto no centro horizontalmente
+                            textAlign="center" 
                         />
 
                     </View>
@@ -96,26 +95,26 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Senha</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../imgs/cadeado.png')} // Substitua pelo ícone desejado
+                            source={require('../../../imgs/cadeado.png')} // Substitua pelo ícone desejado
                             style={styles.inputIcon}
                         />
                         <TextInput
                             style={styles.input}
                             placeholder="Coloque sua senha"
-                            placeholderTextColor="#555555" // Cor do placeholder
+                            placeholderTextColor="#555555"
                             value={password}
                             onChangeText={setPassword}
                             autoCapitalize="none"
                             autoCorrect={false}
                             secureTextEntry={!showPassword}
-                            textAlign="center" // Alinha o texto no centro horizontalmente
+                            textAlign="center" 
                         />
                         <TouchableOpacity
                             style={styles.visibilityIcon}
                             onPress={togglePasswordVisibility}
                         >
                             <Image
-                                source={showPassword ? Mostra : Esconda} // Mostra o ícone correspondente ao estado de showPassword
+                                source={showPassword ? Mostra : Esconda} 
                                 style={styles.visibilityIconImage}
                             />
                         </TouchableOpacity>

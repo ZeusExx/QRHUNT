@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../Firebase/config';
+import { auth } from '../../../Firebase/config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const { width, height } = Dimensions.get('window');
 
-// Importe os ícones para mostrar/ocultar a senha
-import Mostra from '../../imgs/OnIcon.png';
-import Esconda from '../../imgs/OffIcon.png';
+import Mostra from '../../../imgs/OnIcon.png'
+import Esconda from '../../../imgs/OffIcon.png';
 
 const Cadastro = () => {
     const [user, setUser] = useState('');
@@ -75,7 +74,7 @@ const Cadastro = () => {
             <View style={styles.logoContainer}>
                 <Text style={styles.logo}>QRHUNT</Text>
                 <Image
-                    source={require('../../imgs/qrhunt.png')}
+                    source={require('../../../imgs/qrhunt.png')}
                     style={styles.logoImage}
                     resizeMode="contain"
                 />
@@ -86,7 +85,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Usuário</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../imgs/user.png')}
+                        source={require('../../../imgs/user.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput
@@ -106,7 +105,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Email</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../imgs/email.png')}
+                        source={require('../../../imgs/email.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput
@@ -126,7 +125,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Senha</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../imgs/cadeado.png')}
+                        source={require('../../../imgs/cadeado.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput

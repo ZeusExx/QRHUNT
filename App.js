@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Login from './Telas/Login/login';
-import Cadastro from './Telas/Cadastro/cadastro';
-import Inicio from './Telas/Inicio/inicio';
-import Senha from './Telas/Senha/Senha';
+import Login from './Telas/USERS/Login/login'
+import Cadastro from './Telas/USERS/Cadastro/cadastro';
+import Inicio from './Telas/USERS/Inicio/inicio'
+import Senha from './Telas/USERS/Senha/Senha'
 
 const Stack = createStackNavigator();
 
