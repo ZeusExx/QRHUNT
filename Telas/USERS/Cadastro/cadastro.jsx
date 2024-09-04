@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../../Firebase/config';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from '../../../Firebase/config';
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const { width, height } = Dimensions.get('window');
 
-import Mostra from '../../../imgs/OnIcon.png'
+import Mostra from '../../../imgs/OnIcon.png';
 import Esconda from '../../../imgs/OffIcon.png';
 
 const Cadastro = () => {
@@ -14,7 +14,7 @@ const Cadastro = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const [showPassword, setShowPassword] = useState(false); // Estado para controlar a visibilidade da senha
+    const [showPassword, setShowPassword] = useState(false); 
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -27,7 +27,6 @@ const Cadastro = () => {
         }
     }, [error]);
 
-    // Função para alternar a visibilidade da senha
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
@@ -46,8 +45,23 @@ const Cadastro = () => {
         }
 
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            Alert.alert('Cadastro feito com sucesso!');
+            // Verifica se já existe um usuário com o mesmo e-mail
+            const q = query(collection(db, "user"), where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                setError('Este e-mail já está em uso. Por favor, escolha outro e-mail.');
+                return;
+            }
+
+            // Se o e-mail não estiver em uso, crie o novo usuário
+            const userRef = await addDoc(collection(db, "user"), {
+                email: email,
+                nome: user,
+                senha: password,
+            });
+
+            Alert.alert('Cadastro feito com sucesso!', `Seu ID é: ${userRef.id}`);
             setUser('');
             setEmail('');
             setPassword('');
@@ -55,13 +69,6 @@ const Cadastro = () => {
         } catch (err) {
             console.error('Erro durante o cadastro:', err);
             let errorMessage = 'Erro ao cadastrar. Verifique suas informações e tente novamente.';
-            if (err.code === 'auth/weak-password') {
-                errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
-            } else if (err.code === 'auth/email-already-in-use') {
-                errorMessage = 'O email fornecido já está em uso.';
-            } else if (err.code === 'auth/invalid-email') {
-                errorMessage = 'Por favor, insira um email válido.';
-            }
             setError(errorMessage);
         }
     };
@@ -97,7 +104,7 @@ const Cadastro = () => {
                         autoCapitalize="none"
                         autoCorrect={false}
                         maxLength={30}
-                        textAlign="center" // Centraliza o texto horizontalmente
+                        textAlign="center" 
                     />
                 </View>
             </View>
@@ -117,7 +124,7 @@ const Cadastro = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoCorrect={false}
-                        textAlign="center" // Centraliza o texto horizontalmente
+                        textAlign="center" 
                     />
                 </View>
             </View>
@@ -134,16 +141,16 @@ const Cadastro = () => {
                         placeholderTextColor="#555555"
                         value={password}
                         onChangeText={setPassword}
-                        secureTextEntry={!showPassword} // Mostra texto simples ou oculta conforme estado
+                        secureTextEntry={!showPassword} 
                         maxLength={30}
-                        textAlign="center" // Centraliza o texto horizontalmente
+                        textAlign="center" 
                     />
                     <TouchableOpacity
                         style={styles.visibilityIcon}
                         onPress={togglePasswordVisibility}
                     >
                         <Image
-                            source={showPassword ? Mostra : Esconda} // Mostra o ícone correspondente ao estado de showPassword
+                            source={showPassword ? Mostra : Esconda} 
                             style={styles.visibilityIconImage}
                         />
                     </TouchableOpacity>

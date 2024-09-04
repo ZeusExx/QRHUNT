@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../../Firebase/config';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
-import Mostra from '../../../imgs/OnIcon.png'
+import Mostra from '../../../imgs/OnIcon.png';
 import Esconda from '../../../imgs/OffIcon.png';
 
 const Login = () => {
@@ -34,7 +34,7 @@ const Login = () => {
             setError(null);
             navigation.navigate('Inicio'); // Redirecionar para a tela de início
         } catch (err) {
-            console.error('Erro durante o login:', err); // Exibir o erro completo no console
+            console.error('Erro durante o login:', err); 
             let errorMessage = 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
             if (err.code === 'auth/invalid-email') {
                 errorMessage = 'Por favor, insira um e-mail válido.';
@@ -46,12 +46,7 @@ const Login = () => {
     };
 
     const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword); // Inverte o estado atual de showPassword
-    };
-
-    const validateEmail = (email) => {
-        const re = /\S+@\S+\.\S+/;
-        return re.test(email);
+        setShowPassword(!showPassword); 
     };
 
     return (
@@ -74,7 +69,7 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Email</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../../imgs/email.png')} // Substitua pelo ícone desejado
+                            source={require('../../../imgs/email.png')} 
                             style={styles.inputIcon}
                         />
                         <TextInput
@@ -95,7 +90,7 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Senha</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../../imgs/cadeado.png')} // Substitua pelo ícone desejado
+                            source={require('../../../imgs/cadeado.png')} 
                             style={styles.inputIcon}
                         />
                         <TextInput
