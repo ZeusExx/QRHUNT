@@ -8,7 +8,7 @@ import Senha from './Telas/USERS/Senha/Senha'
 
 const Stack = createStackNavigator();
 
-const App = () => {
+const App = () => { 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
