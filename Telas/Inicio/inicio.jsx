@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, ImageBackground } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,9 +23,14 @@ const Inicio = () => {
         />
       </View>
 
-      {/* Conteúdo principal com fundo branco */}
+
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>Nenhuma insígnia no momento</Text>
+        <ImageBackground
+          source={require('../../imgs/urso.png')} 
+          style={styles.imageBackground}
+        >
+          <Text style={styles.welcomeText}>Nenhuma insígnia no momento</Text>
+        </ImageBackground>
       </View>
 
       {/* Barra inferior */}
@@ -63,11 +68,11 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0.02, 
   },
   logo: {
-    width: width * 0.2, // Reduzindo o tamanho da logo
+    width: width * 0.2,
     height: width * 0.1,
   },
   title: {
-    fontSize: width * 0.07, 
+    fontSize: width * 0.07,
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -81,9 +86,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  imageBackground: {
+    width: width * 0.9, 
+    height: width * 0.9,
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
   welcomeText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
+    color: '#000', 
   },
   bottomBar: {
     flexDirection: 'row',
