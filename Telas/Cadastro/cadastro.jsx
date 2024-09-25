@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { db } from '../../../Firebase/config';
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { auth, db } from '../../Firebase/config';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get('window');
 
-import Mostra from '../../../imgs/OnIcon.png';
-import Esconda from '../../../imgs/OffIcon.png';
+import Mostra from '../../imgs/OnIcon.png';
+import Esconda from '../../imgs/OffIcon.png';
 
 const Cadastro = () => {
     const [user, setUser] = useState('');
@@ -45,23 +46,17 @@ const Cadastro = () => {
         }
 
         try {
-            // Verifica se já existe um usuário com o mesmo e-mail
-            const q = query(collection(db, "user"), where("email", "==", email));
-            const querySnapshot = await getDocs(q);
+            // Cria o usuário no Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userFirebase = userCredential.user;
 
-            if (!querySnapshot.empty) {
-                setError('Este e-mail já está em uso. Por favor, escolha outro e-mail.');
-                return;
-            }
-
-            // Se o e-mail não estiver em uso, crie o novo usuário
-            const userRef = await addDoc(collection(db, "user"), {
+            await addDoc(collection(db, "user"), {
                 email: email,
                 nome: user,
-                senha: password,
+                userId: userFirebase.uid, 
             });
 
-            Alert.alert('Cadastro feito com sucesso!', `Seu ID é: ${userRef.id}`);
+            Alert.alert('Cadastro feito com sucesso!', `Bem-vindo, ${user} !`);
             setUser('');
             setEmail('');
             setPassword('');
@@ -69,6 +64,9 @@ const Cadastro = () => {
         } catch (err) {
             console.error('Erro durante o cadastro:', err);
             let errorMessage = 'Erro ao cadastrar. Verifique suas informações e tente novamente.';
+            if (err.code === 'auth/email-already-in-use') {
+                errorMessage = 'Este e-mail já está em uso. Por favor, escolha outro.';
+            }
             setError(errorMessage);
         }
     };
@@ -81,7 +79,7 @@ const Cadastro = () => {
             <View style={styles.logoContainer}>
                 <Text style={styles.logo}>QRHUNT</Text>
                 <Image
-                    source={require('../../../imgs/qrhunt.png')}
+                    source={require('../../imgs/qrhunt.png')}
                     style={styles.logoImage}
                     resizeMode="contain"
                 />
@@ -92,7 +90,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Usuário</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../../imgs/user.png')}
+                        source={require('../../imgs/user.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput
@@ -112,7 +110,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Email</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../../imgs/email.png')}
+                        source={require('../../imgs/email.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput
@@ -132,7 +130,7 @@ const Cadastro = () => {
                 <Text style={styles.inputLabel}>Senha</Text>
                 <View style={styles.inputWithIcon}>
                     <Image
-                        source={require('../../../imgs/cadeado.png')}
+                        source={require('../../imgs/cadeado.png')}
                         style={styles.inputIcon}
                     />
                     <TextInput

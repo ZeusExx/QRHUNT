@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../../Firebase/config';
+import { auth } from '../../Firebase/config';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
-import Mostra from '../../../imgs/OnIcon.png';
-import Esconda from '../../../imgs/OffIcon.png';
+import Mostra from '../../imgs/OnIcon.png';
+import Esconda from '../../imgs/OffIcon.png';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -57,7 +57,7 @@ const Login = () => {
             <View style={styles.logoContainer}>
                 <Text style={styles.logo}>QRHUNT</Text>
                 <Image
-                    source={require('../../../imgs/qrhunt.png')}
+                    source={require('../../imgs/qrhunt.png')}
                     style={styles.logoImage}
                     resizeMode="contain"
                 />
@@ -69,7 +69,7 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Email</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../../imgs/email.png')} 
+                            source={require('../../imgs/email.png')} 
                             style={styles.inputIcon}
                         />
                         <TextInput
@@ -90,7 +90,7 @@ const Login = () => {
                     <Text style={styles.inputLabel}>Senha</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../../imgs/cadeado.png')} 
+                            source={require('../../imgs/cadeado.png')} 
                             style={styles.inputIcon}
                         />
                         <TextInput

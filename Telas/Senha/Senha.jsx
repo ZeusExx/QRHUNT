@@ -36,7 +36,7 @@ const Senha = () => {
                 <View style={styles.logoContainer}>
                     <Text style={styles.logo}>QRHUNT</Text>
                     <Image
-                        source={require('../../../imgs/qrhunt.png')}
+                        source={require('../../imgs/qrhunt.png')}
                         style={styles.logoImage}
                         resizeMode="contain"
                     />
