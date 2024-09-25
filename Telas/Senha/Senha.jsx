@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { sendPasswordResetEmail } from "firebase/auth"; 
-import { auth } from '../../../Firebase/config';
+import { auth } from '../../Firebase/config';
 
 const Senha = () => {
     const [email, setEmail] = useState('');
