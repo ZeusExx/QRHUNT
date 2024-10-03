@@ -1,56 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import * as ImagePicker from 'expo-image-picker'; // Importando o ImagePicker
+import React from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-const Inicio = ({ navigation }) => {
-  const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState(''); // Novo estado para armazenar o nome do usuário
-
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        await AsyncStorage.setItem('user', JSON.stringify(currentUser));
-        setUser(currentUser);
-        
-        // Verifica se o usuário tem um displayName, caso contrário usa o email
-        const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-        setUserName(displayName);
-      } else {
-        await AsyncStorage.removeItem('user');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigation]);
-
-  // Função para abrir a câmera
-  const openCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // Permite ao usuário editar a imagem
-      aspect: [4, 3], // Define a proporção da imagem
-      quality: 1, // Define a qualidade da imagem
-    });
-
-    if (!result.cancelled) {
-      console.log(result.uri); 
-    }
-  };
-
+const Inventario = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Barra superior */}
@@ -72,16 +25,20 @@ const Inicio = ({ navigation }) => {
 
       <View style={styles.content}>
         <Text style={styles.welcomeText}>
-          {user ? `Bem-vindo, ${userName}` : 'Nenhuma insígnia no momento'}
+          Inventário
         </Text>
+        {/* Aqui você pode adicionar o conteúdo do seu inventário */}
       </View>
 
       {/* Barra inferior */}
       <View style={styles.bottomBar}>
-        <Image
-          source={require('../../imgs/bau.png')}
-          style={styles.iconBottom}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Inventario')}>
+          <Image
+            source={require('../../imgs/bau.png')}
+            style={styles.iconBottom}
+          />
+        </TouchableOpacity>
+        
         <View style={styles.separator} />
         
         <TouchableOpacity onPress={openCamera}>
@@ -157,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Inicio;
+export default Inventario;
