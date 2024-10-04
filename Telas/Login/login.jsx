@@ -10,17 +10,17 @@ import Esconda from '../../imgs/OffIcon.png';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null); 
-    const [showPassword, setShowPassword] = useState(false); 
+    const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
     const navigation = useNavigation();
 
     useEffect(() => {
         if (error) {
             const timer = setTimeout(() => {
                 setError(null);
-            }, 3000); 
+            }, 3000);
 
-            return () => clearTimeout(timer); 
+            return () => clearTimeout(timer);
         }
     }, [error]);
 
@@ -34,7 +34,7 @@ const Login = () => {
             setError(null);
             navigation.navigate('Inicio'); // Redirecionar para a tela de início
         } catch (err) {
-            console.error('Erro durante o login:', err); 
+            console.error('Erro durante o login:', err);
             let errorMessage = 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
             if (err.code === 'auth/invalid-email') {
                 errorMessage = 'Por favor, insira um e-mail válido.';
@@ -46,7 +46,7 @@ const Login = () => {
     };
 
     const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword); 
+        setShowPassword(!showPassword);
     };
 
     return (
@@ -63,13 +63,14 @@ const Login = () => {
                 />
             </View>
 
+            {/* Container para o formulário */}
             <View style={styles.formContainer}>
                 {error && <Text style={styles.error}>{error}</Text>}
                 <View style={styles.inputContainer}>
                     <Text style={styles.inputLabel}>Email</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../imgs/email.png')} 
+                            source={require('../../imgs/email.png')}
                             style={styles.inputIcon}
                         />
                         <TextInput
@@ -81,16 +82,15 @@ const Login = () => {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
-                            textAlign="center" 
+                            textAlign="center"
                         />
-
                     </View>
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.inputLabel}>Senha</Text>
                     <View style={styles.inputWithIcon}>
                         <Image
-                            source={require('../../imgs/cadeado.png')} 
+                            source={require('../../imgs/cadeado.png')}
                             style={styles.inputIcon}
                         />
                         <TextInput
@@ -102,39 +102,41 @@ const Login = () => {
                             autoCapitalize="none"
                             autoCorrect={false}
                             secureTextEntry={!showPassword}
-                            textAlign="center" 
+                            textAlign="center"
                         />
                         <TouchableOpacity
                             style={styles.visibilityIcon}
                             onPress={togglePasswordVisibility}
                         >
                             <Image
-                                source={showPassword ? Mostra : Esconda} 
+                                source={showPassword ? Mostra : Esconda}
                                 style={styles.visibilityIconImage}
                             />
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.loginButton}
-                        onPress={handleLogin}
-                    >
-                        <Text style={styles.loginButtonText}>Entrar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.registerLink}
-                        onPress={() => navigation.navigate('Cadastro')}
-                    >
-                        <Text style={styles.registerLinkText}>Não tem uma conta? Cadastre-se</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.registerLink}
-                        onPress={() => navigation.navigate('Senha')}
-                    >
-                        <Text style={styles.registerLinkText}>Esqueceu a senha?</Text>
-                    </TouchableOpacity>
-                </View>
+            </View>
+
+            {/* Botão de Login */}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={handleLogin}
+                >
+                    <Text style={styles.loginButtonText}>Entrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.registerLink}
+                    onPress={() => navigation.navigate('Cadastro')}
+                >
+                    <Text style={styles.registerLinkText}>Não tem uma conta? Cadastre-se</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.registerLink}
+                    onPress={() => navigation.navigate('Senha')}
+                >
+                    <Text style={styles.registerLinkText}>Esqueceu a senha?</Text>
+                </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );
@@ -165,8 +167,15 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 400,
         borderRadius: 10,
-        padding: 20,
+        padding: 10, // Espaço ajustado
         elevation: 4,
+        backgroundColor: '#5cb85c',
+        borderColor: '#a0a0a0', // Cor da borda
+        borderWidth: 1, // Largura da borda
+        shadowColor: '#000', // Cor da sombra
+        shadowOffset: { width: 0.8, height: 0.8 }, // Offset da sombra
+        shadowOpacity: 0.8, // Opacidade da sombra
+        shadowRadius: 10, 
     },
     inputContainer: {
         marginBottom: 12,

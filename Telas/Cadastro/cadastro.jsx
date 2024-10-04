@@ -86,72 +86,74 @@ const Cadastro = () => {
             </View>
             <Text style={styles.title}>Cadastro</Text>
             {error && <Text style={styles.error}>{error}</Text>}
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Usuário</Text>
-                <View style={styles.inputWithIcon}>
-                    <Image
-                        source={require('../../imgs/user.png')}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Crie um usuário"
-                        placeholderTextColor="#555555"
-                        value={user}
-                        onChangeText={setUser}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        maxLength={30}
-                        textAlign="center" 
-                    />
-                </View>
-            </View>
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <View style={styles.inputWithIcon}>
-                    <Image
-                        source={require('../../imgs/email.png')}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Coloque seu email"
-                        placeholderTextColor="#555555"
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        textAlign="center" 
-                    />
-                </View>
-            </View>
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Senha</Text>
-                <View style={styles.inputWithIcon}>
-                    <Image
-                        source={require('../../imgs/cadeado.png')}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Crie uma senha"
-                        placeholderTextColor="#555555"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword} 
-                        maxLength={30}
-                        textAlign="center" 
-                    />
-                    <TouchableOpacity
-                        style={styles.visibilityIcon}
-                        onPress={togglePasswordVisibility}
-                    >
+            <View style={styles.backgroundContainer}>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Usuário</Text>
+                    <View style={styles.inputWithIcon}>
                         <Image
-                            source={showPassword ? Mostra : Esconda} 
-                            style={styles.visibilityIconImage}
+                            source={require('../../imgs/user.png')}
+                            style={styles.inputIcon}
                         />
-                    </TouchableOpacity>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Crie um usuário"
+                            placeholderTextColor="#555555"
+                            value={user}
+                            onChangeText={setUser}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            maxLength={30}
+                            textAlign="center" 
+                        />
+                    </View>
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Email</Text>
+                    <View style={styles.inputWithIcon}>
+                        <Image
+                            source={require('../../imgs/email.png')}
+                            style={styles.inputIcon}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Coloque seu email"
+                            placeholderTextColor="#555555"
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            textAlign="center" 
+                        />
+                    </View>
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Senha</Text>
+                    <View style={styles.inputWithIcon}>
+                        <Image
+                            source={require('../../imgs/cadeado.png')}
+                            style={styles.inputIcon}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Crie uma senha"
+                            placeholderTextColor="#555555"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry={!showPassword} 
+                            maxLength={30}
+                            textAlign="center" 
+                        />
+                        <TouchableOpacity
+                            style={styles.visibilityIcon}
+                            onPress={togglePasswordVisibility}
+                        >
+                            <Image
+                                source={showPassword ? Mostra : Esconda} 
+                                style={styles.visibilityIconImage}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
             <TouchableOpacity style={styles.loginButton} onPress={handleSignup}>
@@ -190,10 +192,27 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: height * 0.02,
     },
-    inputContainer: {
-        marginBottom: height * 0.015,
+    backgroundContainer: {
         width: '90%',
         maxWidth: 400,
+        backgroundColor: '#5cb85c',
+        borderColor: '#a0a0a0', // Cor da borda cinza
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: height * 0.02, // Espaçamento interno
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5, // Sombra no Android
+        marginBottom: height * 0.02,
+    },
+    inputContainer: {
+        marginBottom: height * 0.015,
+        width: '100%',
     },
     inputLabel: {
         marginBottom: height * 0.005,

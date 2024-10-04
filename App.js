@@ -5,7 +5,7 @@ import Login from './Telas/Login/login'
 import Cadastro from './Telas/Cadastro/cadastro';
 import Inicio from './Telas/Inicio/inicio'
 import Senha from './Telas/Senha/Senha'
-import Inventario from './Telas/Inventario/inventario';
+import Inventario from './Telas/Inventario/Inventario';
 
 const Stack = createStackNavigator();
 
