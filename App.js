@@ -6,6 +6,7 @@ import Cadastro from './Telas/Cadastro/cadastro';
 import Inicio from './Telas/Inicio/inicio'
 import Senha from './Telas/Senha/Senha'
 import Inventario from './Telas/Inventario/Inventario';
+import User from './Telas/User/user';
 
 const Stack = createStackNavigator();
 
@@ -16,7 +17,7 @@ const App = () => {
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ headerShown: false }} // Oculta o cabeçalho da tela de Login
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="Cadastro"
@@ -34,8 +35,13 @@ const App = () => {
         options={{ headerShown: false }} 
       />
       <Stack.Screen
-        name="Invetario"
+        name="Inventario"
         component={Inventario}
+        options={{ headerShown: false }} 
+      />
+            <Stack.Screen
+        name="User"
+        component={User}
         options={{ headerShown: false }} 
       />
       </Stack.Navigator>

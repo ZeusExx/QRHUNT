@@ -32,7 +32,7 @@ const Login = () => {
             setEmail('');
             setPassword('');
             setError(null);
-            navigation.navigate('Inicio'); // Redirecionar para a tela de início
+            navigation.navigate('Inicio');
         } catch (err) {
             console.error('Erro durante o login:', err);
             let errorMessage = 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';

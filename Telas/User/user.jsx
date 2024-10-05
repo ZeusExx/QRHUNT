@@ -1,39 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import * as ImagePicker from 'expo-image-picker'; 
-import Inventario from '../Inventario/Inventario';
+import { View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import { getAuth } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../Firebase/config';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
 
-const Inicio = ({ navigation }) => {
-  const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState(''); // Novo estado para armazenar o nome do usuário
+const User = ({ navigation }) => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); // Adiciona estado de carregamento
+  const auth = getAuth();
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        await AsyncStorage.setItem('user', JSON.stringify(currentUser));
-        setUser(currentUser);
-        
-        // Verifica se o usuário tem um displayName, caso contrário usa o email
-        const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-        setUserName(displayName);
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+
+      // Verifique se o usuário está autenticado
+      if (user) {
+        try {
+          // Referenciando o documento do usuário na coleção 'users'
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            setUserData(userDocSnap.data());
+          } else {
+            console.log('Nenhum documento encontrado para o usuário.');
+            setUserData({});
+          }
+        } catch (error) {
+          console.log('Erro ao buscar dados do Firestore:', error);
+          setUserData({});
+        } finally {
+          setLoading(false); // Define loading como false após a busca
+        }
       } else {
-        await AsyncStorage.removeItem('user');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
+        console.log('Usuário não autenticado.');
+        setUserData({});
+        setLoading(false); // Define loading como false se o usuário não estiver autenticado
       }
-    });
+    };
 
-    return () => unsubscribe();
-  }, [navigation]);
+    fetchUserData();
+  }, [auth]);
 
-  // Função para abrir a câmera
+  // Mostre um indicador de carregamento enquanto os dados estão sendo buscados
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Carregando dados do usuário...</Text>
+      </View>
+    );
+  }
+
   const openCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -56,16 +77,18 @@ const Inicio = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* Barra superior */}
       <View style={styles.topBar}>
+      <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
         <Image
           source={require('../../imgs/logoqr.png')}
           style={styles.logo}
         />
+        </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-        <Image
-          source={require('../../imgs/user.png')}
-          style={styles.icon}
-        />
+          <Image
+            source={require('../../imgs/user.png')}
+            style={styles.icon}
+          />
         </TouchableOpacity>
         <Image
           source={require('../../imgs/lupa.png')}
@@ -74,9 +97,20 @@ const Inicio = ({ navigation }) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>
-          {user ? `Bem-vindo, ${userName}` : 'Nenhuma insígnia no momento'}
-        </Text>
+        {userData ? (
+          <>
+            <Text style={styles.text}>Nome: {userData.nome || 'Sem nome'}</Text>
+            <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
+
+            {userData.photoURL ? (
+              <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.text}>Sem foto de perfil</Text>
+            )}
+          </>
+        ) : (
+          <Text style={styles.text}>Nenhum dado encontrado.</Text>
+        )}
       </View>
 
       {/* Barra inferior */}
@@ -139,10 +173,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-  welcomeText: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#000',
+  text: {
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginTop: 16,
   },
   bottomBar: {
     flexDirection: 'row',
@@ -163,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Inicio;
+export default User;

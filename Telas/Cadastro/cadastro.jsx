@@ -193,22 +193,18 @@ const styles = StyleSheet.create({
         marginBottom: height * 0.02,
     },
     backgroundContainer: {
-        width: '90%',
+        width: '100%',
         maxWidth: 400,
-        backgroundColor: '#5cb85c',
-        borderColor: '#a0a0a0', // Cor da borda cinza
-        borderWidth: 1,
         borderRadius: 10,
-        padding: height * 0.02, // Espaçamento interno
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 3,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 5, // Sombra no Android
-        marginBottom: height * 0.02,
+        padding: 10, 
+        elevation: 4,
+        backgroundColor: '#5cb85c',
+        borderColor: '#a0a0a0', 
+        borderWidth: 1, 
+        shadowColor: '#000', 
+        shadowOffset: { width: 0.8, height: 0.8 }, 
+        shadowOpacity: 0.8,
+        shadowRadius: 10, 
     },
     inputContainer: {
         marginBottom: height * 0.015,
