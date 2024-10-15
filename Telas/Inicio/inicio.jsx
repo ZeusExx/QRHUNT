@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker'; 
 import Inventario from '../Inventario/Inventario';
+import Gerador from '../Gerador/Gerador';
 
 const { width, height } = Dimensions.get('window');
 

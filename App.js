@@ -7,6 +7,7 @@ import Inicio from './Telas/Inicio/inicio'
 import Senha from './Telas/Senha/Senha'
 import Inventario from './Telas/Inventario/Inventario';
 import User from './Telas/User/user';
+import Gerador from './Telas/Gerador/Gerador';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,11 @@ const App = () => {
             <Stack.Screen
         name="User"
         component={User}
+        options={{ headerShown: false }} 
+      />
+            <Stack.Screen
+        name="Gerador"
+        component={Gerador}
         options={{ headerShown: false }} 
       />
       </Stack.Navigator>
