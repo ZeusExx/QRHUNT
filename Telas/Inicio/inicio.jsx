@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    padding: 20,
   },
   welcomeText: {
     fontSize: width * 0.06,
@@ -168,10 +169,21 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   firebaseImage: {
-    width: width * 0.8,
-    height: height * 0.4,
+    width: width * 0.7, // Diminuindo a largura da imagem para 70%
+    height: height * 0.3, // Diminuindo a altura da imagem para 30%
     resizeMode: 'contain',
     marginTop: 20,
+    borderWidth: 2,
+    borderColor: '#7ed758',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   bottomBar: {
     flexDirection: 'row',
