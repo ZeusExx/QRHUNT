@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Importar o Storage
 import * as ImagePicker from 'expo-image-picker'; 
-import Inventario from '../Inventario/Inventario';
-import Gerador from '../Gerador/Gerador';
 
 const { width, height } = Dimensions.get('window');
 
 const Inicio = ({ navigation }) => {
   const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState(''); // Novo estado para armazenar o nome do usuário
+  const [userName, setUserName] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // Estado para armazenar a URL da imagem
 
   useEffect(() => {
     const auth = getAuth();
@@ -19,7 +19,6 @@ const Inicio = ({ navigation }) => {
         await AsyncStorage.setItem('user', JSON.stringify(currentUser));
         setUser(currentUser);
         
-        // Verifica se o usuário tem um displayName, caso contrário usa o email
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         setUserName(displayName);
       } else {
@@ -30,6 +29,20 @@ const Inicio = ({ navigation }) => {
         });
       }
     });
+
+    // Função para buscar a URL da imagem no Firebase Storage
+    const fetchImageUrl = async () => {
+      const storage = getStorage();
+      const imageRef = ref(storage, 'download.jpg'); // Referência para a imagem no Storage
+      try {
+        const url = await getDownloadURL(imageRef);
+        setImageUrl(url); // Armazena a URL no estado
+      } catch (error) {
+        console.error("Erro ao obter a URL da imagem: ", error);
+      }
+    };
+
+    fetchImageUrl(); // Chama a função ao montar o componente
 
     return () => unsubscribe();
   }, [navigation]);
@@ -43,13 +56,13 @@ const Inicio = ({ navigation }) => {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // Permite ao usuário editar a imagem
-      aspect: [4, 3], // Define a proporção da imagem
-      quality: 1, // Define a qualidade da imagem
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
     if (!result.cancelled) {
-      console.log(result.uri); 
+      console.log(result.uri);
     }
   };
 
@@ -63,10 +76,10 @@ const Inicio = ({ navigation }) => {
         />
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-        <Image
-          source={require('../../imgs/user.png')}
-          style={styles.icon}
-        />
+          <Image
+            source={require('../../imgs/user.png')}
+            style={styles.icon}
+          />
         </TouchableOpacity>
         <Image
           source={require('../../imgs/lupa.png')}
@@ -78,6 +91,15 @@ const Inicio = ({ navigation }) => {
         <Text style={styles.welcomeText}>
           {user ? `Bem-vindo, ${userName}` : 'Nenhuma insígnia no momento'}
         </Text>
+        
+        {imageUrl ? (
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.firebaseImage}
+          />
+        ) : (
+          <Text>Carregando imagem...</Text>
+        )}
       </View>
 
       {/* Barra inferior */}
@@ -144,6 +166,12 @@ const styles = StyleSheet.create({
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#000',
+  },
+  firebaseImage: {
+    width: width * 0.8,
+    height: height * 0.4,
+    resizeMode: 'contain',
+    marginTop: 20,
   },
   bottomBar: {
     flexDirection: 'row',
