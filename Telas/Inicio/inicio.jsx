@@ -2,25 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getStorage, ref, getDownloadURL } from "firebase/storage"; // Importar o Storage
-import * as ImagePicker from 'expo-image-picker'; 
+import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
+import { getFirestore, doc, getDoc } from 'firebase/firestore'; 
 
 const { width, height } = Dimensions.get('window');
 
 const Inicio = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // Estado para armazenar a URL da imagem
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     const auth = getAuth();
+    const db = getFirestore();
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         await AsyncStorage.setItem('user', JSON.stringify(currentUser));
         setUser(currentUser);
+
+        // Obter o nome do usuário da subcoleção
+        const userDocRef = doc(db, 'user', 'user', currentUser.uid); // Referência para o documento do usuário
+        const userDoc = await getDoc(userDocRef);
         
-        const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-        setUserName(displayName);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          console.log("Dados do usuário:", userData); // Adicione um log para verificar os dados
+          setUserName(userData.nome || "Nome não disponível"); // Defina o nome
+        } else {
+          console.log("Nenhum documento encontrado para o usuário.");
+          setUserName("Nome não disponível");
+        }
       } else {
         await AsyncStorage.removeItem('user');
         navigation.reset({
@@ -30,24 +41,22 @@ const Inicio = ({ navigation }) => {
       }
     });
 
-
     const fetchImageUrl = async () => {
       const storage = getStorage();
       const imageRef = ref(storage, 'virgula.png'); 
       try {
         const url = await getDownloadURL(imageRef);
-        setImageUrl(url); // Armazena a URL no estado
+        setImageUrl(url);
       } catch (error) {
         console.error("Erro ao obter a URL da imagem: ", error);
       }
     };
 
-    fetchImageUrl(); // Chama a função ao montar o componente
+    fetchImageUrl(); 
 
     return () => unsubscribe();
   }, [navigation]);
 
-  // Função para abrir a câmera
   const openCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -68,23 +77,13 @@ const Inicio = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Barra superior */}
       <View style={styles.topBar}>
-        <Image
-          source={require('../../imgs/logoqr.png')}
-          style={styles.logo}
-        />
+        <Image source={require('../../imgs/logoqr.png')} style={styles.logo} />
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-          <Image
-            source={require('../../imgs/user.png')}
-            style={styles.icon}
-          />
+          <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
-        <Image
-          source={require('../../imgs/lupa.png')}
-          style={styles.icon}
-        />
+        <Image source={require('../../imgs/lupa.png')} style={styles.icon} />
       </View>
 
       <View style={styles.content}>
@@ -93,38 +92,25 @@ const Inicio = ({ navigation }) => {
         </Text>
         
         {imageUrl ? (
-          <Image
-            source={{ uri: imageUrl }}
-            style={styles.firebaseImage}
-          />
+          <Image source={{ uri: imageUrl }} style={styles.firebaseImage} />
         ) : (
           <Text>Carregando imagem...</Text>
         )}
       </View>
 
-      {/* Barra inferior */}
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Inventario')}>
-          <Image
-            source={require('../../imgs/bau.png')}
-            style={styles.iconBottom}
-          />
+          <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         </TouchableOpacity>
 
         <View style={styles.separator} />
         
         <TouchableOpacity onPress={openCamera}>
-          <Image
-            source={require('../../imgs/camera.png')}
-            style={styles.iconBottom}
-          />
+          <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
 
         <View style={styles.separator} />
-        <Image
-          source={require('../../imgs/membros.png')}
-          style={styles.iconBottom}
-        />
+        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
       </View>
     </SafeAreaView>
   );
@@ -169,8 +155,8 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   firebaseImage: {
-    width: width * 0.7, // Diminuindo a largura da imagem para 70%
-    height: height * 0.3, // Diminuindo a altura da imagem para 30%
+    width: width * 0.7,
+    height: height * 0.3,
     resizeMode: 'contain',
     marginTop: 20,
     borderWidth: 2,
