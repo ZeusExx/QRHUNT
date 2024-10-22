@@ -30,10 +30,10 @@ const Inicio = ({ navigation }) => {
       }
     });
 
-    // Função para buscar a URL da imagem no Firebase Storage
+
     const fetchImageUrl = async () => {
       const storage = getStorage();
-      const imageRef = ref(storage, 'download.jpg'); // Referência para a imagem no Storage
+      const imageRef = ref(storage, 'virgula.png'); 
       try {
         const url = await getDownloadURL(imageRef);
         setImageUrl(url); // Armazena a URL no estado
