@@ -155,8 +155,15 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     logo: {
-        fontSize: 28,
+        fontSize: 42, 
         fontWeight: 'bold',
+        color: '#ffffff', 
+        textShadowColor: '#000000', 
+        textShadowOffset: { width: 2, height: 2 }, 
+        textShadowRadius: 6, 
+        letterSpacing: 5, 
+        fontFamily: 'Roboto', 
+        marginTop: 10,
     },
     logoImage: {
         width: 150,

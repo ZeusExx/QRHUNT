@@ -1,7 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<activity
+  android:name=".MainActivity"
+  android:label="@string/app_name"
+  android:exported="true"
+  android:launchMode="singleTask">
+  <intent-filter android:label="QRHunt">
+    <action android:name="android.intent.action.VIEW" />
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
 
-    <application android:usesCleartextTraffic="true" tools:targetApi="28" tools:ignore="GoogleAppIndexingWarning" tools:replace="android:usesCleartextTraffic" />
-</manifest>
+    <data android:scheme="qrcode" android:host="qrhuntapp" />
+  </intent-filter>
+</activity>
