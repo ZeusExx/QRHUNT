@@ -1,4 +1,7 @@
-# QRHUNT 
+# QRHUNT - App para escanear Insígnias
 
-Rodar App : npx expo start
-Puxar Commit : git pull
+Feito por Nicolas e Mateus
+
+Inicializar com : npx expo start
+
+Puxar atualizações do github : git pull

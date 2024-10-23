@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Importe as funções do Firebase Storage
 import { db } from '../../Firebase/config';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -9,17 +10,16 @@ const { width, height } = Dimensions.get('window');
 
 const User = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true); // Adiciona estado de carregamento
+  const [loading, setLoading] = useState(true);
   const auth = getAuth();
+  const storage = getStorage(); // Inicialize o Firebase Storage
 
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
 
-      // Verifique se o usuário está autenticado
       if (user) {
         try {
-          // Referenciando o documento do usuário na coleção 'users'
           const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
@@ -33,19 +33,18 @@ const User = ({ navigation }) => {
           console.log('Erro ao buscar dados do Firestore:', error);
           setUserData({});
         } finally {
-          setLoading(false); // Define loading como false após a busca
+          setLoading(false);
         }
       } else {
         console.log('Usuário não autenticado.');
         setUserData({});
-        setLoading(false); // Define loading como false se o usuário não estiver autenticado
+        setLoading(false);
       }
     };
 
     fetchUserData();
   }, [auth]);
 
-  // Mostre um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
     return (
       <View style={styles.container}>
@@ -55,87 +54,86 @@ const User = ({ navigation }) => {
     );
   }
 
-  const openCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  const openGallery = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
+      Alert.alert('Erro', 'Permissão para acessar a galeria foi negada.');
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // Permite ao usuário editar a imagem
-      aspect: [4, 3], // Define a proporção da imagem
-      quality: 1, // Define a qualidade da imagem
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    if (!result.cancelled) {
-      console.log(result.uri); 
+    if (!result.canceled) {
+      console.log(result.assets[0].uri); // Exibe a URI da imagem
+      // Atualizar a foto no Firestore
+      await updateProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const updateProfileImage = async (uri) => {
+    try {
+      const user = auth.currentUser;
+      const userDocRef = doc(db, 'users', user.uid);
+
+      const storageRef = ref(storage, `perfil/${user.uid}.jpg`); 
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      await uploadBytes(storageRef, blob);
+
+      const photoURL = await getDownloadURL(storageRef);
+
+      await updateDoc(userDocRef, { photoURL });
+      setUserData(prevData => ({ ...prevData, photoURL })); 
+    } catch (error) {
+      console.log('Erro ao atualizar a imagem de perfil:', error);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Barra superior */}
       <View style={styles.topBar}>
-      <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
-        <Image
-          source={require('../../imgs/logoqr.png')}
-          style={styles.logo}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
+          <Image source={require('../../imgs/logoqr.png')} style={styles.logo} />
         </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-          <Image
-            source={require('../../imgs/user.png')}
-            style={styles.icon}
-          />
+          <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
-        <Image
-          source={require('../../imgs/lupa.png')}
-          style={styles.icon}
-        />
+        <Image source={require('../../imgs/lupa.png')} style={styles.icon} />
       </View>
 
       <View style={styles.content}>
         {userData ? (
           <>
-            <Text style={styles.text}>Nome: {userData.nome || 'Sem nome'}</Text>
-            <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
-
             {userData.photoURL ? (
               <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
             ) : (
               <Text style={styles.text}>Sem foto de perfil</Text>
             )}
+            <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
+
+            <TouchableOpacity style={styles.button} onPress={openGallery}>
+              <Text style={styles.buttonText}>Selecionar Imagem</Text>
+            </TouchableOpacity>
           </>
         ) : (
           <Text style={styles.text}>Nenhum dado encontrado.</Text>
         )}
       </View>
 
-      {/* Barra inferior */}
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Inventario')}>
-          <Image
-            source={require('../../imgs/bau.png')}
-            style={styles.iconBottom}
-          />
+          <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         </TouchableOpacity>
 
         <View style={styles.separator} />
-        
-        <TouchableOpacity onPress={openCamera}>
-          <Image
-            source={require('../../imgs/camera.png')}
-            style={styles.iconBottom}
-          />
-        </TouchableOpacity>
 
-        <View style={styles.separator} />
-        <Image
-          source={require('../../imgs/membros.png')}
-          style={styles.iconBottom}
-        />
+        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
       </View>
     </SafeAreaView>
   );
@@ -182,6 +180,16 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginTop: 16,
+  },
+  button: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#007BFF',
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   bottomBar: {
     flexDirection: 'row',
