@@ -96,10 +96,15 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     logo: {
-        fontSize: 24,
+        fontSize: 42, 
         fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#000000', 
+        color: '#ffffff', 
+        textShadowColor: '#000000', 
+        textShadowOffset: { width: 2, height: 2 }, 
+        textShadowRadius: 6, 
+        letterSpacing: 5, 
+        fontFamily: 'Roboto', 
+        marginTop: 10,
     },
     logoImage: {
         width: 150, 

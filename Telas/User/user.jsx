@@ -78,6 +78,7 @@ const User = ({ navigation }) => {
     if (!result.canceled) {
       console.log(result.assets[0].uri); 
       setUploading(true);
+
       const resizedImage = await ImageManipulator.manipulateAsync(
         result.assets[0].uri,
         [{ resize: { width: 800, height: 800 } }],
@@ -189,12 +190,27 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     marginBottom: 8,
+    marginTop: 20, 
   },
+  
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginTop: 16,
+    width: 250, 
+    height: 250, 
+    borderRadius: 150, 
+    borderWidth: 5, 
+    borderColor: '#007BFF', 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.5, 
+    shadowRadius: 4, 
+    elevation: 5, 
+    marginTop: 5,
+  },
+  
+
+  touchableProfileImage: {
+    borderRadius: 75, 
+    overflow: 'hidden',
   },
   button: {
     marginTop: 20,
