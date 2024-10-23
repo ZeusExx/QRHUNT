@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         textShadowColor: '#000000', 
         textShadowOffset: { width: 2, height: 2 }, 
         textShadowRadius: 6, 
-        letterSpacing: 5,
+        letterSpacing: 5, 
         fontFamily: 'Roboto', 
         marginTop: 10,
     },

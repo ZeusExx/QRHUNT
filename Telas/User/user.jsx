@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Importe as funções do Firebase Storage
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../../Firebase/config';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -11,8 +21,9 @@ const { width, height } = Dimensions.get('window');
 const User = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const auth = getAuth();
-  const storage = getStorage(); // Inicialize o Firebase Storage
+  const storage = getStorage();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -20,14 +31,20 @@ const User = ({ navigation }) => {
 
       if (user) {
         try {
-          const userDocRef = doc(db, 'users', user.uid);
+          const userDocRef = doc(db, 'users', user.uid, 'user', user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
             setUserData(userDocSnap.data());
           } else {
-            console.log('Nenhum documento encontrado para o usuário.');
-            setUserData({});
+            console.log('Nenhum documento encontrado para o usuário. Criando documento...');
+            // Create the user document if it doesn't exist
+            await setDoc(userDocRef, {
+              email: user.email,
+              name: user.displayName || 'Nome não disponível',
+              userId: user.uid,
+            });
+            setUserData({ email: user.email, name: user.displayName || 'Nome não disponível', userId: user.uid });
           }
         } catch (error) {
           console.log('Erro ao buscar dados do Firestore:', error);
@@ -70,7 +87,7 @@ const User = ({ navigation }) => {
 
     if (!result.canceled) {
       console.log(result.assets[0].uri); // Exibe a URI da imagem
-      // Atualizar a foto no Firestore
+      setUploading(true);
       await updateProfileImage(result.assets[0].uri);
     }
   };
@@ -78,19 +95,21 @@ const User = ({ navigation }) => {
   const updateProfileImage = async (uri) => {
     try {
       const user = auth.currentUser;
-      const userDocRef = doc(db, 'users', user.uid);
+      const userDocRef = doc(db, 'users', user.uid, 'user', user.uid);
 
-      const storageRef = ref(storage, `perfil/${user.uid}.jpg`); 
+      const storageRef = ref(storage, `Profile/${user.uid}.jpg`);
       const response = await fetch(uri);
       const blob = await response.blob();
       await uploadBytes(storageRef, blob);
 
       const photoURL = await getDownloadURL(storageRef);
 
-      await updateDoc(userDocRef, { photoURL });
-      setUserData(prevData => ({ ...prevData, photoURL })); 
+      await updateDoc(userDocRef, { photoURL }); // Update the user's profile image
+      setUserData((prevData) => ({ ...prevData, photoURL }));
     } catch (error) {
       console.log('Erro ao atualizar a imagem de perfil:', error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -116,9 +135,10 @@ const User = ({ navigation }) => {
               <Text style={styles.text}>Sem foto de perfil</Text>
             )}
             <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
+            <Text style={styles.text}>Nome: {userData.name}</Text>
 
             <TouchableOpacity style={styles.button} onPress={openGallery}>
-              <Text style={styles.buttonText}>Selecionar Imagem</Text>
+              <Text style={styles.buttonText}>{uploading ? 'Carregando...' : 'Selecionar Imagem'}</Text>
             </TouchableOpacity>
           </>
         ) : (
