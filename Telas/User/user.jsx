@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ActivityIndicator,
-  Dimensions,
-  SafeAreaView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import {View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../../Firebase/config';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,10 +32,9 @@ const User = ({ navigation }) => {
             // Create the user document if it doesn't exist
             await setDoc(userDocRef, {
               email: user.email,
-              name: user.displayName || 'Nome não disponível',
               userId: user.uid,
             });
-            setUserData({ email: user.email, name: user.displayName || 'Nome não disponível', userId: user.uid });
+            setUserData({ email: user.email, userId: user.uid });
           }
         } catch (error) {
           console.log('Erro ao buscar dados do Firestore:', error);
@@ -86,9 +76,15 @@ const User = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      console.log(result.assets[0].uri); // Exibe a URI da imagem
+      console.log(result.assets[0].uri); 
       setUploading(true);
-      await updateProfileImage(result.assets[0].uri);
+      const resizedImage = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 800, height: 800 } }],
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } 
+      );
+      
+      await updateProfileImage(resizedImage.uri); 
     }
   };
 
@@ -135,7 +131,6 @@ const User = ({ navigation }) => {
               <Text style={styles.text}>Sem foto de perfil</Text>
             )}
             <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
-            <Text style={styles.text}>Nome: {userData.name}</Text>
 
             <TouchableOpacity style={styles.button} onPress={openGallery}>
               <Text style={styles.buttonText}>{uploading ? 'Carregando...' : 'Selecionar Imagem'}</Text>
