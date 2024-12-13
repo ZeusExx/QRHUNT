@@ -1,31 +1,48 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
 
 const Inventario = ({ navigation }) => {
-  const handleNavigation = (screen) => {
-    if (navigation) {
-      navigation.navigate(screen);
+  const openCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        console.log(result.uri);
+      }
+    } catch (error) {
+      console.error('Erro ao abrir a câmera:', error);
+      Alert.alert('Erro', 'Algo deu errado ao tentar acessar a câmera.');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Barra superior */}
       <View style={styles.topBar}>
-      <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
-        <Image
-          source={require('../../imgs/logoqr.png')}
-          style={styles.logo}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
+          <Image
+            source={require('../../imgs/logoqr.png')}
+            style={styles.logo}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-        <Image
-          source={require('../../imgs/user.png')}
-          style={styles.icon}
-        />
+          <Image
+            source={require('../../imgs/user.png')}
+            style={styles.icon}
+          />
         </TouchableOpacity>
         <Image
           source={require('../../imgs/lupa.png')}
@@ -33,19 +50,17 @@ const Inventario = ({ navigation }) => {
         />
       </View>
 
-      {/* Conteúdo principal */}
       <View style={styles.content}>
-        <Text style={styles.welcomeText}> Nada por aqui...</Text>
+        <Text style={styles.welcomeText}>Nada por aqui...</Text>
       </View>
 
-      {/* Barra inferior */}
       <View style={styles.bottomBar}>
         <Image
           source={require('../../imgs/bau.png')}
           style={styles.iconBottom}
         />
         <View style={styles.separator} />
-        <TouchableOpacity onPress={() => handleNavigation('Camera')}>
+        <TouchableOpacity onPress={openCamera}>
           <Image
             source={require('../../imgs/camera.png')}
             style={styles.iconBottom}

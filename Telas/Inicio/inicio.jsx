@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
 import * as ImagePicker from 'expo-image-picker';
-import QRCode from 'react-native-qrcode-svg'; // Importar QRCode
+import QRCode from 'react-native-qrcode-svg';
 
 const { width, height } = Dimensions.get('window');
 
@@ -49,20 +49,26 @@ const Inicio = ({ navigation }) => {
   }, [navigation]);
 
   const openCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
+        return;
+      }
+  
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled) {
+        console.log(result.uri);
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      console.log(result.uri);
+      }
+    } catch (error) {
+      console.error('Erro ao abrir a câmera:', error);
+      Alert.alert('Erro', 'Algo deu errado ao tentar acessar a câmera.');
     }
   };
 
