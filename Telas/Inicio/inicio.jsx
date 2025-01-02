@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -37,7 +37,7 @@ const Inicio = ({ navigation }) => {
   useEffect(() => {
     const fetchInsignia = async () => {
       const db = getFirestore();
-      const docRef = doc(db, 'insignia', '1');
+      const docRef = doc(db, 'insignia', '1'); // Alterar para a lógica que busca a insignia
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -55,8 +55,42 @@ const Inicio = ({ navigation }) => {
     fetchInsignia();
   }, []);
 
+  useEffect(() => {
+    const handleUrl = async (url) => {
+      const insigniaId = url.split('/').pop(); // Obtendo o ID da insignia da URL
+
+      // Agora, obtenha a insignia do Firestore
+      const db = getFirestore();
+      const docRef = doc(db, 'insignia', insigniaId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const insigniaData = docSnap.data();
+
+        // Aqui você deve adicionar a insignia ao inventário do usuário
+        const user = await AsyncStorage.getItem('user');
+        const currentUser = JSON.parse(user);
+
+        // Adicionando a insignia ao inventário
+        const userRef = doc(db, 'user', currentUser.uid, 'user', currentUser.uid);
+        await updateDoc(userRef, {
+          inventario: [...(userRef.inventario || []), insigniaData],
+        });
+
+        console.log('Insignia adicionada ao inventário!');
+      }
+    };
+
+    Linking.addEventListener('url', (event) => handleUrl(event.url));
+
+    return () => {
+      Linking.removeEventListener('url', (event) => handleUrl(event.url));
+    };
+  }, []);
+
   const GenerateQRCode = ({ insigniaId }) => {
-    const qrValue = `https://seu-app.com/insignia/${insigniaId}`;
+nia
+    const qrValue = `exp://192.168.100.129:8081/insignia/${insigniaId}`; //http://localhost:8081
 
     return (
       <QRCode
