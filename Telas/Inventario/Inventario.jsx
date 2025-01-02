@@ -44,10 +44,6 @@ const Inventario = ({ navigation }) => {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <Image
-          source={require('../../imgs/lupa.png')}
-          style={styles.icon}
-        />
       </View>
 
       <View style={styles.content}>

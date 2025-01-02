@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
-import { getAuth } from 'firebase/auth';
+import { View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import { getAuth, signOut } from 'firebase/auth';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../../Firebase/config';
@@ -29,7 +29,7 @@ const User = ({ navigation }) => {
             setUserData(userDocSnap.data());
           } else {
             console.log('Nenhum documento encontrado para o usuário. Criando documento...');
-            // Create the user document if it doesn't exist
+
             await setDoc(userDocRef, {
               email: user.email,
               userId: user.uid,
@@ -82,7 +82,7 @@ const User = ({ navigation }) => {
       const resizedImage = await ImageManipulator.manipulateAsync(
         result.assets[0].uri,
         [{ resize: { width: 800, height: 800 } }],
-        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } 
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
       );
       
       await updateProfileImage(resizedImage.uri); 
@@ -101,12 +101,25 @@ const User = ({ navigation }) => {
 
       const photoURL = await getDownloadURL(storageRef);
 
-      await updateDoc(userDocRef, { photoURL }); // Update the user's profile image
+      await updateDoc(userDocRef, { photoURL });
       setUserData((prevData) => ({ ...prevData, photoURL }));
     } catch (error) {
       console.log('Erro ao atualizar a imagem de perfil:', error);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      Alert.alert('Erro', 'Não foi possível fazer logout.');
     }
   };
 
@@ -120,7 +133,6 @@ const User = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
           <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
-        <Image source={require('../../imgs/lupa.png')} style={styles.icon} />
       </View>
 
       <View style={styles.content}>
@@ -135,6 +147,10 @@ const User = ({ navigation }) => {
 
             <TouchableOpacity style={styles.button} onPress={openGallery}>
               <Text style={styles.buttonText}>{uploading ? 'Carregando...' : 'Selecionar Imagem'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.button} onPress={handleLogout}>
+              <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -192,7 +208,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 20, 
   },
-  
   profileImage: {
     width: 250, 
     height: 250, 
@@ -205,12 +220,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4, 
     elevation: 5, 
     marginTop: 5,
-  },
-  
-
-  touchableProfileImage: {
-    borderRadius: 75, 
-    overflow: 'hidden',
   },
   button: {
     marginTop: 20,

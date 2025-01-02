@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
 import * as ImagePicker from 'expo-image-picker';
-import QRCode from 'react-native-qrcode-svg';
 
 const { width, height } = Dimensions.get('window');
 
 const Inicio = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); 
-  const [qrValue, setQrValue] = useState('https://www.google.com.br/?hl=pt-BR'); 
 
   useEffect(() => {
     const auth = getAuth();
@@ -31,19 +27,6 @@ const Inicio = ({ navigation }) => {
         });
       }
     });
-
-    const fetchImageUrl = async () => {
-      const storage = getStorage();
-      const imageRef = ref(storage, 'virgula.png'); 
-      try {
-        const url = await getDownloadURL(imageRef);
-        setImageUrl(url);
-      } catch (error) {
-        console.error("Erro ao obter a URL da imagem: ", error);
-      }
-    };
-
-    fetchImageUrl(); 
 
     return () => unsubscribe();
   }, [navigation]);
@@ -64,7 +47,6 @@ const Inicio = ({ navigation }) => {
   
       if (!result.cancelled) {
         console.log(result.uri);
-
       }
     } catch (error) {
       console.error('Erro ao abrir a câmera:', error);
@@ -80,28 +62,13 @@ const Inicio = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
           <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
-        <Image source={require('../../imgs/lupa.png')} style={styles.icon} />
+
       </View>
 
       <View style={styles.content}>
         <Text style={styles.welcomeText}>
-          {user ? `Bem-vindo, ${userName}` : 'Nenhuma insígnia no momento'}
+          {user ? `Bem-vindo, ${userName}` : 'Nenhum conteúdo disponível no momento'}
         </Text>
-        
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.firebaseImage} />
-        ) : (
-          <Text>Carregando imagem...</Text>
-        )}
-
-        <View style={styles.qrCodeContainer}>
-          <QRCode
-            value={qrValue}
-            size={150}
-            color="black"
-            backgroundColor="white"
-          />
-        </View>
       </View>
 
       <View style={styles.bottomBar}>
@@ -116,7 +83,9 @@ const Inicio = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.separator} />
+        <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
         <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -159,28 +128,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#000',
-  },
-  firebaseImage: {
-    width: width * 0.7, 
-    height: height * 0.3, 
-    resizeMode: 'contain',
-    marginTop: 20,
-    borderWidth: 2,
-    borderColor: '#7ed758',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  qrCodeContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   bottomBar: {
     flexDirection: 'row',
