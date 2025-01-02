@@ -149,8 +149,8 @@ const User = ({ navigation }) => {
               <Text style={styles.buttonText}>{uploading ? 'Carregando...' : 'Selecionar Imagem'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-              <Text style={styles.buttonText}>Sair</Text>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>      SAIR    </Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -165,7 +165,9 @@ const User = ({ navigation }) => {
 
         <View style={styles.separator} />
 
+        <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
         <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -196,6 +198,16 @@ const styles = StyleSheet.create({
   icon: {
     width: width * 0.08,
     height: width * 0.08,
+  },
+  logoutButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#FF0000', 
+    borderRadius: 5,
+  },
+  logoutButtonText: {
+    color: '#fff', 
+    fontSize: 16,
   },
   content: {
     flex: 1,

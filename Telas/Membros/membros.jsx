@@ -53,7 +53,7 @@ const Membros = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.memberContainer}>
-      <Text style={styles.memberEmail}> Usuário : {item.email.split('@')[0]} </Text>
+      <Text style={styles.memberEmail}> Usuário : {item.email.split('@')[0]} ,</Text>
       <Text style={styles.memberBadges}> Insígnias : {item.badges}</Text>
     </View>
   );
