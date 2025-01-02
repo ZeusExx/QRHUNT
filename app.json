@@ -8,7 +8,9 @@
     },
     "android": {
       "package": "com.qrhunt.qrhunt"
-    }
+    },
+    "plugins": [
+      "expo-barcode-scanner"
+    ]
   }
 }
- 

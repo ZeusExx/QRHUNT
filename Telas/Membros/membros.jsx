@@ -21,7 +21,7 @@ const Membros = ({ navigation }) => {
 
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         setUserName(displayName);
-        fetchMembers(currentUser); // Carregar os membros do banco de dados
+        fetchMembers(currentUser); 
       } else {
         await AsyncStorage.removeItem('user');
         navigation.reset({
@@ -84,7 +84,9 @@ const Membros = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <Image source={require('../../imgs/logoqr.png')} style={styles.logo} />
+        <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
+          <Image source={require('../../imgs/logoqr.png')} style={styles.logo} />
+        </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
           <Image source={require('../../imgs/user.png')} style={styles.icon} />

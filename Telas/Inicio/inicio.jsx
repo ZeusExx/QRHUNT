@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import * as ImagePicker from 'expo-image-picker';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import QRCode from 'react-native-qrcode-svg';
 
 const { width, height } = Dimensions.get('window');
 
 const Inicio = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
+  const [insigniaData, setInsigniaData] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -16,7 +19,7 @@ const Inicio = ({ navigation }) => {
       if (currentUser) {
         await AsyncStorage.setItem('user', JSON.stringify(currentUser));
         setUser(currentUser);
-        
+
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         setUserName(displayName);
       } else {
@@ -31,27 +34,38 @@ const Inicio = ({ navigation }) => {
     return () => unsubscribe();
   }, [navigation]);
 
-  const openCamera = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Erro', 'Permissão para acessar a câmera foi negada.');
-        return;
+  useEffect(() => {
+    const fetchInsignia = async () => {
+      const db = getFirestore();
+      const docRef = doc(db, 'insignia', '1');
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const storage = getStorage();
+        const imageRef = ref(storage, data.img);
+        const imageUrl = await getDownloadURL(imageRef);
+
+        setInsigniaData({ ...data, imgUrl: imageUrl });
+      } else {
+        console.log('Documento não encontrado!');
       }
-  
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-      if (!result.cancelled) {
-        console.log(result.uri);
-      }
-    } catch (error) {
-      console.error('Erro ao abrir a câmera:', error);
-      Alert.alert('Erro', 'Algo deu errado ao tentar acessar a câmera.');
-    }
+    };
+
+    fetchInsignia();
+  }, []);
+
+  const GenerateQRCode = ({ insigniaId }) => {
+    const qrValue = `https://seu-app.com/insignia/${insigniaId}`;
+
+    return (
+      <QRCode
+        value={qrValue}
+        size={200}
+        color="black"
+        backgroundColor="white"
+      />
+    );
   };
 
   return (
@@ -62,29 +76,41 @@ const Inicio = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
           <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
-
       </View>
 
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.welcomeText}>
           {user ? `Bem-vindo, ${userName}` : 'Nenhum conteúdo disponível no momento'}
         </Text>
-      </View>
+
+        {insigniaData ? (
+          <View style={styles.insigniaContainer}>
+            {insigniaData.imgUrl ? (
+              <Image source={{ uri: insigniaData.imgUrl }} style={styles.insigniaImage} />
+            ) : (
+              <Text>Carregando imagem...</Text>
+            )}
+            <Text style={styles.insigniaDescription}>{insigniaData.descricao}</Text>
+            <Text style={styles.insigniaRarity}>Raridade: {insigniaData.raridade} </Text>
+            <Text> </Text>
+            <GenerateQRCode insigniaId={insigniaData.id} />
+          </View>
+        ) : (
+          <Text>Carregando insignia...</Text>
+        )}
+      </ScrollView>
 
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Inventario')}>
           <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         </TouchableOpacity>
-
         <View style={styles.separator} />
-        
-        <TouchableOpacity onPress={openCamera}>
+        <TouchableOpacity onPress={() => navigation.navigate('Scanner')}>
           <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
-
         <View style={styles.separator} />
         <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
-        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+          <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -117,17 +143,45 @@ const styles = StyleSheet.create({
     width: width * 0.08,
     height: width * 0.08,
   },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
+  scrollContent: {
+    padding: 20,
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 20,
   },
   welcomeText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#000',
+    marginTop: height * 0.02, 
+  },
+  insigniaContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  insigniaImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    objectFit: 'cover',
+    marginBottom: 20,
+  },
+  insigniaDescription: {
+    fontSize: 16,
+    fontWeight: 'normal',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
+  insigniaRarity: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ff5722',
+    textAlign: 'center',
   },
   bottomBar: {
     flexDirection: 'row',

@@ -63,10 +63,9 @@ const Inventario = ({ navigation }) => {
           />
         </TouchableOpacity>
         <View style={styles.separator} />
-        <Image
-          source={require('../../imgs/membros.png')}
-          style={styles.iconBottom}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
+        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
