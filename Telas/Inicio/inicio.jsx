@@ -37,7 +37,7 @@ const Inicio = ({ navigation }) => {
   useEffect(() => {
     const fetchInsignia = async () => {
       const db = getFirestore();
-      const docRef = doc(db, 'insignia', '1'); // Alterar para a lógica que busca a insignia
+      const docRef = doc(db, 'insignia', '1'); 
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -57,9 +57,9 @@ const Inicio = ({ navigation }) => {
 
   useEffect(() => {
     const handleUrl = async (url) => {
-      const insigniaId = url.split('/').pop(); // Obtendo o ID da insignia da URL
+      const insigniaId = url.split('/').pop(); 
 
-      // Agora, obtenha a insignia do Firestore
+    
       const db = getFirestore();
       const docRef = doc(db, 'insignia', insigniaId);
       const docSnap = await getDoc(docRef);
@@ -67,11 +67,11 @@ const Inicio = ({ navigation }) => {
       if (docSnap.exists()) {
         const insigniaData = docSnap.data();
 
-        // Aqui você deve adicionar a insignia ao inventário do usuário
+        
         const user = await AsyncStorage.getItem('user');
         const currentUser = JSON.parse(user);
 
-        // Adicionando a insignia ao inventário
+       
         const userRef = doc(db, 'user', currentUser.uid, 'user', currentUser.uid);
         await updateDoc(userRef, {
           inventario: [...(userRef.inventario || []), insigniaData],
@@ -89,7 +89,6 @@ const Inicio = ({ navigation }) => {
   }, []);
 
   const GenerateQRCode = ({ insigniaId }) => {
-nia
     const qrValue = `exp://192.168.100.129:8081/insignia/${insigniaId}`; //http://localhost:8081
 
     return (

@@ -34,28 +34,31 @@ const Cadastro = () => {
 
     const handleSignup = async () => {
         setError(null);
-
+    
         if (user.length < 3) {
             setError('O usuário deve ter pelo menos 3 caracteres.');
             return;
         }
-
+    
         if (password.length < 8) {
             setError('A senha deve ter pelo menos 8 caracteres.');
             return;
         }
-
+    
         try {
-            // Cria o usuário no Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const userFirebase = userCredential.user;
-
-            await addDoc(collection(db, "user"), {
+    
+            const userDoc = await addDoc(collection(db, "user"), {
                 email: email,
                 nome: user,
                 userId: userFirebase.uid, 
             });
-
+    
+            await addDoc(collection(db, `user/${userDoc.id}/badges`), {
+                initial: "Nenhuma insígnia ainda",
+            });
+    
             Alert.alert('Cadastro feito com sucesso!', `Bem-vindo, ${user} !`);
             setUser('');
             setEmail('');

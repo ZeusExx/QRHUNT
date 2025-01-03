@@ -1,10 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
 const Inventario = ({ navigation }) => {
+  const [badge, setBadge] = useState(null);
+
+  useEffect(() => {
+    const fetchBadge = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+          const db = getFirestore();
+          const badgesRef = collection(db, 'user', user.uid, 'badges');
+          const badgesSnapshot = await getDocs(badgesRef);
+
+          if (!badgesSnapshot.empty) {
+            const badges = badgesSnapshot.docs.map(doc => doc.data());
+            setBadge(badges[0]);
+          } else {
+            setBadge(null);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar insígnias:', error);
+      }
+    };
+
+    fetchBadge();
+  }, []);
+
   const openCamera = async () => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -32,39 +61,31 @@ const Inventario = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
-          <Image
-            source={require('../../imgs/logoqr.png')}
-            style={styles.logo}
-          />
+          <Image source={require('../../imgs/logoqr.png')} style={styles.logo} />
         </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-          <Image
-            source={require('../../imgs/user.png')}
-            style={styles.icon}
-          />
+          <Image source={require('../../imgs/user.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>Nada por aqui...</Text>
+        {badge ? (
+          <Text style={styles.welcomeText}>Você tem a insígnia: {badge.name}</Text>
+        ) : (
+          <Text style={styles.welcomeText}>Nenhuma insígnia encontrada.</Text>
+        )}
       </View>
 
       <View style={styles.bottomBar}>
-        <Image
-          source={require('../../imgs/bau.png')}
-          style={styles.iconBottom}
-        />
+        <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         <View style={styles.separator} />
         <TouchableOpacity onPress={openCamera}>
-          <Image
-            source={require('../../imgs/camera.png')}
-            style={styles.iconBottom}
-          />
+          <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
         <View style={styles.separator} />
         <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
-        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+          <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
