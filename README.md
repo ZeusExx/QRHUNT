@@ -6,6 +6,7 @@ Funcionalidades:
 - Escaneamento de QR Codes: O usuário pode escanear QR Codes para adicionar insígnias ou itens ao seu inventário.
 - Armazenamento em Firebase: As imagens e os dados dos itens escaneados são armazenados de forma segura no Firebase, permitindo acesso fácil e rápido.
 - Interface Intuitiva: A aplicação foi desenvolvida para ser amigável e fácil de usar, com foco na experiência do usuário.
+
  => Tecnologias Utilizadas:
 - Expo: Para desenvolvimento e deploy do aplicativo.
 - Firebase: Para gerenciamento de banco de dados e armazenamento de arquivos.
