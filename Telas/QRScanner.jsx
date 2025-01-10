@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -9,6 +9,8 @@ const { width, height } = Dimensions.get('window');
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false); // Controla o estado da câmera
+  const cameraRef = useRef(null);
 
   const qrToImageMap = {
     "eca!.jpeg": "eca!.png",
@@ -21,7 +23,8 @@ const QRScanner = ({ navigation }) => {
   };
 
   const handleBarCodeRead = async ({ data }) => {
-    if (scanned) return;
+    if (!isCameraReady || scanned) return; // Só processa o QR code se a câmera estiver pronta
+
     setScanned(true);
 
     if (qrToImageMap[data]) {
@@ -30,17 +33,22 @@ const QRScanner = ({ navigation }) => {
 
         const db = getFirestore();
         const user = JSON.parse(await AsyncStorage.getItem('user'));
-        const userRef = doc(db, 'user', user.uid); // Alterado para buscar diretamente pelo uid
+        const userRef = doc(db, 'user', user.uid);
         const userSnap = await getDoc(userRef);
-        const currentInventory = userSnap.data()?.inventario || [];
 
-        if (!currentInventory.includes(matchedImage)) {
-          await updateDoc(userRef, {
-            inventario: [...currentInventory, matchedImage],
-          });
-          Alert.alert('Sucesso', `Imagem "${matchedImage}" adicionada ao inventário!`);
+        if (userSnap.exists()) {
+          const currentInventory = userSnap.data()?.inventario || [];
+
+          if (!currentInventory.includes(matchedImage)) {
+            await updateDoc(userRef, {
+              inventario: [...currentInventory, matchedImage],
+            });
+            Alert.alert('Sucesso', `Imagem "${matchedImage}" adicionada ao inventário!`);
+          } else {
+            Alert.alert('Aviso', `"${matchedImage}" já está no inventário.`);
+          }
         } else {
-          Alert.alert('Aviso', `"${matchedImage}" já está no inventário.`);
+          Alert.alert('Erro', 'Usuário não encontrado.');
         }
       } catch (error) {
         Alert.alert('Erro', 'Ocorreu um erro ao atualizar o inventário.');
@@ -49,17 +57,31 @@ const QRScanner = ({ navigation }) => {
     } else {
       Alert.alert('QR Code inválido', 'O QR code lido não corresponde a nenhum item.');
     }
-    setScanned(false);
+
+    setTimeout(() => setScanned(false), 1000);
+  };
+
+  const onCameraReady = () => {
+    setIsCameraReady(true); // Marca a câmera como pronta
   };
 
   return (
     <View style={styles.container}>
       <RNCamera
+        ref={cameraRef}
         style={styles.camera}
-        onBarCodeRead={handleBarCodeRead}
+        onBarCodeRead={isCameraReady ? handleBarCodeRead : undefined} // Só chama o evento quando a câmera estiver pronta
         captureAudio={false}
         flashMode={RNCamera.Constants.FlashMode.off}
-        type={RNCamera.Constants.Type.back} // Teste alterando para .Type.front
+        type={RNCamera.Constants.Type.back}
+        onCameraReady={onCameraReady} // Marca a câmera como pronta
+        androidCameraPermissionOptions={{
+          title: 'Permissão para usar a câmera',
+          message: 'Nós precisamos de permissão para usar a câmera',
+          buttonPositive: 'OK',
+          buttonNegative: 'Cancelar',
+        }}
+        iosCameraPermissionDialogMessage="Nós precisamos de permissão para usar a câmera"
       >
         <View style={styles.overlay} />
         <Text style={styles.instruction}>Posicione o QR Code no centro</Text>
@@ -92,7 +114,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Cor do fundo para deixar o QR code visível
   },
   instruction: {
     textAlign: 'center',
@@ -104,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontWeight: 'bold',
     position: 'absolute',
-    bottom: '10%', 
+    bottom: '10%',
     left: '50%',
     transform: [{ translateX: -width * 0.25 }],
   },

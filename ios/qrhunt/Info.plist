@@ -4,6 +4,13 @@
 <dict>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+
+    <!-- Descrição de permissões -->
+    <key>NSCameraUsageDescription</key>
+    <string>Esta aplicação precisa de permissão para acessar a câmera</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Esta aplicação precisa de permissão para acessar o microfone</string>
+    
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleExecutable</key>
@@ -24,6 +31,8 @@
     <string>1</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+
+    <!-- Segurança de Transporte de Aplicativo -->
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
@@ -31,12 +40,18 @@
         <key>NSAllowsLocalNetworking</key>
         <true/>
     </dict>
+
+    <!-- Adicionando a linha para SplashScreen -->
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
+    
+    <!-- Requisitos de dispositivo -->
     <key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>arm64</string>
+        <string>camera</string> <!-- Garantir que o dispositivo tenha câmera -->
     </array>
+
     <key>UIStatusBarStyle</key>
     <string>UIStatusBarStyleDefault</string>
     <key>UISupportedInterfaceOrientations</key>
@@ -47,13 +62,7 @@
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-    
-    <!-- Permissões para câmera e microfone -->
-    <key>NSCameraUsageDescription</key>
-    <string>Esta aplicação precisa de permissão para acessar a câmera</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Esta aplicação precisa de permissão para acessar o microfone</string>
-    
+
     <!-- Configuração para Deep Linking -->
     <key>CFBundleURLTypes</key>
     <array>

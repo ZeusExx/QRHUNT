@@ -26,6 +26,7 @@ const Login = () => {
         }
     }, [error]);
 
+
     const handleLogin = async () => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -35,11 +36,12 @@ const Login = () => {
             navigation.navigate('Inicio');
         } catch (err) {
 
-            console.error('Erro durante o login:', err);
-
-            Alert.alert("Erro ao fazer login", "Verifique suas credenciais e tente novamente.");
+            console.error('Erro durante o login:', err); 
+            
+            setError("Verifique suas credenciais e tente novamente.");
         }
     };
+    
     
 
     const togglePasswordVisibility = () => {
