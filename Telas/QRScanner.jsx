@@ -9,7 +9,7 @@ const { width, height } = Dimensions.get('window');
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
-  const [isCameraReady, setIsCameraReady] = useState(false); // Controla o estado da câmera
+  const [isCameraReady, setIsCameraReady] = useState(false); 
   const cameraRef = useRef(null);
 
   const qrToImageMap = {
@@ -23,7 +23,7 @@ const QRScanner = ({ navigation }) => {
   };
 
   const handleBarCodeRead = async ({ data }) => {
-    if (!isCameraReady || scanned) return; // Só processa o QR code se a câmera estiver pronta
+    if (!isCameraReady || scanned) return;
 
     setScanned(true);
 
@@ -62,7 +62,7 @@ const QRScanner = ({ navigation }) => {
   };
 
   const onCameraReady = () => {
-    setIsCameraReady(true); // Marca a câmera como pronta
+    setIsCameraReady(true); 
   };
 
   return (
@@ -70,11 +70,11 @@ const QRScanner = ({ navigation }) => {
       <RNCamera
         ref={cameraRef}
         style={styles.camera}
-        onBarCodeRead={isCameraReady ? handleBarCodeRead : undefined} // Só chama o evento quando a câmera estiver pronta
+        onBarCodeRead={isCameraReady ? handleBarCodeRead : undefined} 
         captureAudio={false}
         flashMode={RNCamera.Constants.FlashMode.off}
         type={RNCamera.Constants.Type.back}
-        onCameraReady={onCameraReady} // Marca a câmera como pronta
+        onCameraReady={onCameraReady} 
         androidCameraPermissionOptions={{
           title: 'Permissão para usar a câmera',
           message: 'Nós precisamos de permissão para usar a câmera',
