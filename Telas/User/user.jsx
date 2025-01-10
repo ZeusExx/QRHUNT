@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { getAuth, signOut } from 'firebase/auth';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../../Firebase/config';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { deleteDoc } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get('window');
 
@@ -124,50 +123,6 @@ const User = ({ navigation }) => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    const user = auth.currentUser;
-    const userDocRef = doc(db, 'users', user.uid, 'user', user.uid);
-    const storageRef = ref(storage, `Profile/${user.uid}.jpg`);
-
-    Alert.alert(
-      'Excluir Conta',
-      'Você tem certeza que deseja excluir sua conta? Esta ação é irreversível.',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Deletar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-
-              await deleteObject(storageRef);
-              console.log('Foto de perfil excluída.');
-  
-              await deleteDoc(userDocRef);
-              console.log('Dados do usuário excluídos do Firestore.');
-  
-              await user.delete();
-              console.log('Conta excluída do Firebase Authentication.');
-  
-              await signOut(auth);
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-              });
-            } catch (error) {
-              console.error('Erro ao excluir a conta:', error);
-              Alert.alert('Erro', 'Não foi possível excluir sua conta. Tente novamente.');
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
@@ -183,30 +138,19 @@ const User = ({ navigation }) => {
       <View style={styles.content}>
         {userData ? (
           <>
-<View style={styles.profileImageContainer}>
-  <View style={styles.glowEffect} />
-  {userData.photoURL ? (
-    <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
-  ) : (
-    <Text style={styles.text}>Sem foto de perfil</Text>
-  )}
-  <TouchableOpacity style={styles.editButton} onPress={openGallery}>
-    <Text style={styles.editButtonText}>
-      {userData.photoURL ? 'Editar Foto' : 'Adicionar Foto'}
-    </Text>
-  </TouchableOpacity>
-</View>
+            {userData.photoURL ? (
+              <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.text}>Sem foto de perfil</Text>
+            )}
+            <Text style={styles.text}>E-mail: {auth.currentUser?.email}</Text>
 
-            <View style={styles.emailContainer}>
-              <Text style={styles.emailText}>E-mail: {auth.currentUser?.email}</Text>
-            </View>
-
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutButtonText}>SAIR</Text>
+            <TouchableOpacity style={styles.button} onPress={openGallery}>
+              <Text style={styles.buttonText}>{uploading ? 'Carregando...' : 'Selecionar Imagem'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
-              <Text style={styles.deleteButtonText}>DELETAR CONTA</Text>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>      SAIR    </Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -222,7 +166,7 @@ const User = ({ navigation }) => {
         <View style={styles.separator} />
 
         <TouchableOpacity onPress={() => navigation.navigate('Membros')}>
-          <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
+        <Image source={require('../../imgs/membros.png')} style={styles.iconBottom} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -258,11 +202,11 @@ const styles = StyleSheet.create({
   logoutButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#FF0000',
+    backgroundColor: '#FF0000', 
     borderRadius: 5,
   },
   logoutButtonText: {
-    color: '#fff',
+    color: '#fff', 
     fontSize: 16,
   },
   content: {
@@ -273,76 +217,38 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: '#333',
-    fontWeight: 'bold',
-    marginTop: 20,
-  },
-  profileImageContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    position: 'relative',
+    marginBottom: 8,
+    marginTop: 20, 
   },
   profileImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 150,
-    borderWidth: 8,
-    borderColor: '#7ed758',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 8,
+    width: 250, 
+    height: 250, 
+    borderRadius: 150, 
+    borderWidth: 5, 
+    borderColor: '#007BFF', 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.5, 
+    shadowRadius: 4, 
+    elevation: 5, 
+    marginTop: 5,
   },
-  glowEffect: {
-    position: 'absolute',
-    width: 270,
-    height: 270,
-    borderRadius: 135,
-    borderWidth: 2,
-    borderColor: 'rgba(126, 215, 88, 0.6)',
-    zIndex: -1,
-  },
-  editButton: {
-    marginTop: 15, 
+  button: {
+    marginTop: 20,
+    padding: 10,
     backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    borderRadius: 5,
   },
-  editButtonText: {
+  buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
-  },
-  emailContainer: {
-    backgroundColor: '#F1F1F1',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  emailText: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
   },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
-    paddingHorizontal: width * 0.20,
+    paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.01,
   },
   iconBottom: {
@@ -354,17 +260,6 @@ const styles = StyleSheet.create({
     height: width * 0.1,
     backgroundColor: '#000',
   },
-  deleteButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#FF6347',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
 });
+
 export default User;

@@ -169,13 +169,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    backgroundColor: '#f0f0f0', 
-    borderRadius: 10,
-    borderWidth: 3,
-    borderColor: '#d1d1d1', 
-    marginVertical: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
   },
   memberEmail: {
     fontSize: 16,
@@ -203,4 +199,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
 });
+
 export default Membros;

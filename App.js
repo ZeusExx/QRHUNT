@@ -8,6 +8,8 @@ import Senha from './Telas/Senha/Senha'
 import Inventario from './Telas/Inventario/Inventario';
 import User from './Telas/User/user';
 import Membros from './Telas/Membros/membros';
+import QRScanner from './Telas/QRScanner';
+
 
 const Stack = createStackNavigator();
 
@@ -48,6 +50,11 @@ const App = () => {
                   <Stack.Screen
         name="Membros"
         component={Membros} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen
+        name="QRScanner"
+        component={QRScanner} 
         options={{ headerShown: false }} 
       />
       </Stack.Navigator>

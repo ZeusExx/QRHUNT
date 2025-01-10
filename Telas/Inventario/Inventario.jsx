@@ -1,34 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 const { width, height } = Dimensions.get('window');
 
 const Inventario = ({ navigation }) => {
   const [badge, setBadge] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBadgeData = async () => {
+    const fetchBadge = async () => {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
         if (user) {
           const db = getFirestore();
-  
-          const badgeRef = doc(db, 'insignia', '7'); 
-          const badgeSnapshot = await getDoc(badgeRef);
+          const badgesRef = collection(db, 'user', user.uid, 'badges');
+          const badgesSnapshot = await getDocs(badgesRef);
 
-          if (badgeSnapshot.exists()) {
-            const badgeData = badgeSnapshot.data();
-            console.log('Dados da Insígnia:', badgeData); 
-            setBadge(badgeData); 
+          if (!badgesSnapshot.empty) {
+            const badges = badgesSnapshot.docs.map(doc => doc.data());
+            setBadge(badges[0]);
           } else {
-            console.log('Insígnia não encontrada.');
             setBadge(null);
           }
         }
@@ -37,21 +31,7 @@ const Inventario = ({ navigation }) => {
       }
     };
 
-    const fetchImage = async () => {
-      try {
-        const storage = getStorage();
-        const imageRef = ref(storage, 'rdb.png');
-        const url = await getDownloadURL(imageRef);
-        setImageUrl(url);
-      } catch (error) {
-        console.error('Erro ao buscar a imagem do Storage:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBadgeData();
-    fetchImage();
+    fetchBadge();
   }, []);
 
   const openCamera = async () => {
@@ -89,29 +69,13 @@ const Inventario = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        {loading ? ( 
-          <ActivityIndicator size="large" color="#7ed758" />
+      <View style={styles.content}>
+        {badge ? (
+          <Text style={styles.welcomeText}>Você tem a insígnia: {badge.name}</Text>
         ) : (
-          <View style={styles.qrCodeBackground}>
-            <Text style={styles.foundText}>Encontrada:</Text>
-            {imageUrl ? (
-              <Image source={{ uri: imageUrl }} style={styles.badgeImage} />
-            ) : (
-              <Text style={styles.errorText}>Imagem não encontrada.</Text>
-            )}
-            {badge ? (
-              <>
-                <Text style={styles.badgeTitle}>{badge.nome || 'Nome não encontrado'}</Text>
-                <Text style={styles.badgeDescription}>{badge.descricao || 'Descrição não encontrada'}</Text>
-                <Text style={styles.badgeRarity}>Raridade: {badge.raridade || 'Raridade não encontrada'}</Text>
-              </>
-            ) : (
-              <Text style={styles.errorText}>Insígnia não encontrada.</Text>
-            )}
-          </View>
+          <Text style={styles.welcomeText}>Nenhuma insígnia encontrada.</Text>
         )}
-      </ScrollView>
+      </View>
 
       <View style={styles.bottomBar}>
         <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
@@ -155,47 +119,13 @@ const styles = StyleSheet.create({
     height: width * 0.08,
   },
   content: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.02,
   },
-  qrCodeBackground: {
-    backgroundColor: '#f2f2f2',
-    padding: width * 0.05,
-    borderRadius: 10,
-    alignItems: 'center',
-    width: width * 0.9,
-    marginBottom: 20,
-  },
-  foundText: {
+  welcomeText: {
     fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#ff5733',
-    marginBottom: 10,
-  },
-  badgeImage: {
-    width: width * 0.6,
-    height: width * 0.4,
-    resizeMode: 'contain',
-    marginBottom: 20,
-  },
-  badgeTitle: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 10,
-  },
-  badgeDescription: {
-    fontSize: width * 0.04,
-    textAlign: 'center',
-    color: '#555',
-    marginBottom: 20,
-  },
-  badgeRarity: {
-    fontSize: width * 0.05,
     fontWeight: 'bold',
     color: '#000',
   },
@@ -215,10 +145,6 @@ const styles = StyleSheet.create({
     width: 2,
     height: width * 0.1,
     backgroundColor: '#000',
-  },
-  errorText: {
-    fontSize: width * 0.05,
-    color: '#f00',
   },
 });
 

@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Camera } from 'expo-camera'; 
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import QRCode from 'react-native-qrcode-svg';
 
 const { width, height } = Dimensions.get('window');
 
 const Inicio = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
-  const [hasPermission, setHasPermission] = useState(null);
-  const [camera, setCamera] = useState(null);
+  const [insigniaData, setInsigniaData] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -29,24 +30,72 @@ const Inicio = ({ navigation }) => {
         });
       }
     });
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
 
     return () => unsubscribe();
   }, [navigation]);
 
-  const openCamera = () => {
-    if (hasPermission === null) {
-      alert("A permissão para acessar a câmera ainda não foi solicitada.");
-      return;
-    } else if (hasPermission === false) {
-      alert("A permissão para acessar a câmera foi negada.");
-      return;
-    }
+  useEffect(() => {
+    const fetchInsignia = async () => {
+      const db = getFirestore();
+      const docRef = doc(db, 'insignia', '1');
+      const docSnap = await getDoc(docRef);
 
-    navigation.navigate('CameraScreen'); 
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const storage = getStorage();
+        const imageRef = ref(storage, data.img);
+        const imageUrl = await getDownloadURL(imageRef);
+
+        setInsigniaData({ ...data, imgUrl: imageUrl });
+      } else {
+        console.log('Documento não encontrado!');
+      }
+    };
+
+    fetchInsignia();
+  }, []);
+
+  useEffect(() => {
+    const handleUrl = async (url) => {
+      const insigniaId = url.split('/').pop();
+
+      const db = getFirestore();
+      const docRef = doc(db, 'insignia', insigniaId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const insigniaData = docSnap.data();
+
+        const user = await AsyncStorage.getItem('user');
+        const currentUser = JSON.parse(user);
+
+        const userRef = doc(db, 'user', currentUser.uid, 'user', currentUser.uid);
+        await updateDoc(userRef, {
+          inventario: [...(userRef.inventario || []), insigniaData],
+        });
+
+        console.log('Insignia adicionada ao inventário!');
+      }
+    };
+
+    Linking.addEventListener('url', (event) => handleUrl(event.url));
+
+    return () => {
+      Linking.removeEventListener('url', (event) => handleUrl(event.url));
+    };
+  }, []);
+
+  const GenerateQRCode = ({ insigniaId }) => {
+    const qrValue = `exp://192.168.100.129:8081/insignia/${insigniaId}`;
+
+    return (
+      <QRCode
+        value={qrValue}
+        size={200}
+        color="black"
+        backgroundColor="white"
+      />
+    );
   };
 
   return (
@@ -64,14 +113,27 @@ const Inicio = ({ navigation }) => {
           {user ? `Bem-vindo, ${userName}` : 'Nenhum conteúdo disponível no momento'}
         </Text>
 
-        <Text style={styles.welcomeText}>
-          Conheça o,{' '}
-          <Text style={styles.highlightedText}>QRHUNT</Text>
-        </Text>
+        <TouchableOpacity
+          style={styles.qrScannerButton}
+          onPress={() => navigation.navigate('QRScanner')}
+        >
+          <Text style={styles.qrScannerButtonText}>Ir para QRScanner</Text>
+        </TouchableOpacity>
 
-        <Text style={styles.welcomeText}>
-          Explore o IFC e procure insígnias! 
-        </Text>
+        {insigniaData ? (
+          <View style={styles.insigniaContainer}>
+            {insigniaData.imgUrl ? (
+              <Image source={{ uri: insigniaData.imgUrl }} style={styles.insigniaImage} />
+            ) : (
+              <Text>Carregando imagem...</Text>
+            )}
+            <Text style={styles.insigniaDescription}>{insigniaData.descricao}</Text>
+            <Text style={styles.insigniaRarity}>Raridade: {insigniaData.raridade} </Text>
+            <GenerateQRCode insigniaId={insigniaData.id} />
+          </View>
+        ) : (
+          <Text>Carregando insignia...</Text>
+        )}
       </ScrollView>
 
       <View style={styles.bottomBar}>
@@ -79,7 +141,7 @@ const Inicio = ({ navigation }) => {
           <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         </TouchableOpacity>
         <View style={styles.separator} />
-        <TouchableOpacity onPress={openCamera}>
+        <TouchableOpacity onPress={() => navigation.navigate('Scanner')}>
           <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
         <View style={styles.separator} />
@@ -120,33 +182,62 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#fff', 
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
   welcomeText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#000',
     marginTop: height * 0.02,
+  },
+  qrScannerButton: {
+    marginVertical: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#0066CC',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  qrScannerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  insigniaContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  insigniaImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  insigniaDescription: {
+    fontSize: 16,
+    fontWeight: 'normal',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
+  insigniaRarity: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ff5722',
     textAlign: 'center',
   },
-  highlightedText: {
-    color: '#FF6347', 
-    fontWeight: 'bold',
-    fontSize: width * 0.07,
-  },
   bottomBar: {
-    position: 'absolute',
-    left: 0,
-    bottom: 20, 
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
     paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.01,
-    width: '100%',
   },
   iconBottom: {
     width: width * 0.1,
