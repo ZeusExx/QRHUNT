@@ -47,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+<string>Esta aplicação precisa de permissão para acessar a câmera</string>
 </dict>
 </plist>

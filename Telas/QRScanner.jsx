@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window'); 
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
@@ -50,6 +53,10 @@ const QRScanner = ({ navigation }) => {
     setScanned(false);
   };
 
+  const onCameraReady = () => {
+    console.log('Câmera pronta para ser usada');
+  };
+
   return (
     <View style={styles.container}>
       <RNCamera
@@ -57,6 +64,8 @@ const QRScanner = ({ navigation }) => {
         onBarCodeRead={handleBarCodeRead}
         captureAudio={false}
         flashMode={RNCamera.Constants.FlashMode.off}
+        onCameraReady={onCameraReady}
+        type={RNCamera.Constants.Type.back}
       >
         <View style={styles.overlay} />
         <Text style={styles.instruction}>Posicione o QR Code no centro</Text>
@@ -72,33 +81,55 @@ const QRScanner = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    backgroundColor: '#000',
   },
   camera: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
   },
   instruction: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 18,
     color: '#fff',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontWeight: 'bold',
+    position: 'absolute',
+    bottom: '10%', 
+    left: '50%',
+    transform: [{ translateX: -width * 0.25 }], 
   },
   backButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 40,
     left: 20,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: '#FF6347',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   backText: {
-    fontSize: 16,
-    color: '#000',
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
