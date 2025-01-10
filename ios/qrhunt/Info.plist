@@ -48,6 +48,8 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-<string>Esta aplicação precisa de permissão para acessar a câmera</string>
+	<string>Esta aplicação precisa de permissão para acessar a câmera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Esta aplicação precisa de permissão para acessar o microfone</string>
 </dict>
 </plist>

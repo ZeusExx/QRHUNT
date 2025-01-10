@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window'); 
+const { width, height } = Dimensions.get('window');
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
@@ -30,8 +30,7 @@ const QRScanner = ({ navigation }) => {
 
         const db = getFirestore();
         const user = JSON.parse(await AsyncStorage.getItem('user'));
-        const userRef = doc(db, 'user', user.uid, 'user', user.uid);
-
+        const userRef = doc(db, 'user', user.uid); // Alterado para buscar diretamente pelo uid
         const userSnap = await getDoc(userRef);
         const currentInventory = userSnap.data()?.inventario || [];
 
@@ -53,10 +52,6 @@ const QRScanner = ({ navigation }) => {
     setScanned(false);
   };
 
-  const onCameraReady = () => {
-    console.log('Câmera pronta para ser usada');
-  };
-
   return (
     <View style={styles.container}>
       <RNCamera
@@ -64,13 +59,13 @@ const QRScanner = ({ navigation }) => {
         onBarCodeRead={handleBarCodeRead}
         captureAudio={false}
         flashMode={RNCamera.Constants.FlashMode.off}
-        onCameraReady={onCameraReady}
-        type={RNCamera.Constants.Type.back}
+        type={RNCamera.Constants.Type.back} // Teste alterando para .Type.front
       >
         <View style={styles.overlay} />
         <Text style={styles.instruction}>Posicione o QR Code no centro</Text>
         <View style={styles.overlay} />
       </RNCamera>
+
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>Voltar</Text>
       </TouchableOpacity>
@@ -81,7 +76,7 @@ const QRScanner = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
   },
@@ -111,7 +106,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: '10%', 
     left: '50%',
-    transform: [{ translateX: -width * 0.25 }], 
+    transform: [{ translateX: -width * 0.25 }],
   },
   backButton: {
     position: 'absolute',
