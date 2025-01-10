@@ -30,11 +30,7 @@ const User = ({ navigation }) => {
             setUserData(userDocSnap.data());
           } else {
             console.log('Nenhum documento encontrado para o usuário. Criando documento...');
-
-            await setDoc(userDocRef, {
-              email: user.email,
-              userId: user.uid,
-            });
+            await setDoc(userDocRef, { email: user.email, userId: user.uid });
             setUserData({ email: user.email, userId: user.uid });
           }
         } catch (error) {
@@ -133,25 +129,18 @@ const User = ({ navigation }) => {
       'Excluir Conta',
       'Você tem certeza que deseja excluir sua conta? Esta ação é irreversível.',
       [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
+        { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Deletar',
           style: 'destructive',
           onPress: async () => {
             try {
-
               await deleteObject(storageRef);
               console.log('Foto de perfil excluída.');
-  
               await deleteDoc(userDocRef);
               console.log('Dados do usuário excluídos do Firestore.');
-  
               await user.delete();
               console.log('Conta excluída do Firebase Authentication.');
-  
               await signOut(auth);
               navigation.reset({
                 index: 0,
@@ -183,19 +172,19 @@ const User = ({ navigation }) => {
       <View style={styles.content}>
         {userData ? (
           <>
-<View style={styles.profileImageContainer}>
-  <View style={styles.glowEffect} />
-  {userData.photoURL ? (
-    <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
-  ) : (
-    <Text style={styles.text}>Sem foto de perfil</Text>
-  )}
-  <TouchableOpacity style={styles.editButton} onPress={openGallery}>
-    <Text style={styles.editButtonText}>
-      {userData.photoURL ? 'Editar Foto' : 'Adicionar Foto'}
-    </Text>
-  </TouchableOpacity>
-</View>
+            <View style={styles.profileImageContainer}>
+              <View style={styles.glowEffect} />
+              {userData.photoURL ? (
+                <Image source={{ uri: userData.photoURL }} style={styles.profileImage} />
+              ) : (
+                <Text style={styles.text}>Sem foto de perfil</Text>
+              )}
+              <TouchableOpacity style={styles.editButton} onPress={openGallery}>
+                <Text style={styles.editButtonText}>
+                  {userData.photoURL ? 'Editar Foto' : 'Adicionar Foto'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.emailContainer}>
               <Text style={styles.emailText}>E-mail: {auth.currentUser?.email}</Text>
@@ -233,13 +222,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#7ed758',
+    justifyContent: 'space-between',
+    paddingTop: height * 0.05, 
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
-    paddingHorizontal: width * 0.02,
+    paddingHorizontal: width * 0.04,
     paddingVertical: height * 0.02,
   },
   logo: {
@@ -256,37 +247,38 @@ const styles = StyleSheet.create({
     height: width * 0.08,
   },
   logoutButton: {
-    marginTop: 20,
-    padding: 10,
+    marginTop: height * 0.03,
+    padding: width * 0.04,
     backgroundColor: '#FF0000',
     borderRadius: 5,
   },
   logoutButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    paddingHorizontal: width * 0.05,
   },
   text: {
-    fontSize: 18,
+    fontSize: width * 0.05,
     color: '#333',
     fontWeight: 'bold',
-    marginTop: 20,
+    marginTop: height * 0.02,
   },
   profileImageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.05,
     position: 'relative',
   },
   profileImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 150,
+    width: width * 0.6,
+    height: width * 0.6,
+    borderRadius: width * 0.3,
     borderWidth: 8,
     borderColor: '#7ed758',
     shadowColor: '#000',
@@ -297,24 +289,19 @@ const styles = StyleSheet.create({
   },
   glowEffect: {
     position: 'absolute',
-    width: 270,
-    height: 270,
-    borderRadius: 135,
+    width: width * 0.68,
+    height: width * 0.68,
+    borderRadius: width * 0.34,
     borderWidth: 2,
     borderColor: 'rgba(126, 215, 88, 0.6)',
     zIndex: -1,
   },
   editButton: {
-    marginTop: 15, 
+    marginTop: height * 0.02, 
     backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.1,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
   },
   editButtonText: {
     color: '#fff',
@@ -322,18 +309,13 @@ const styles = StyleSheet.create({
   },
   emailContainer: {
     backgroundColor: '#F1F1F1',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.05,
     borderRadius: 8,
-    marginTop: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    marginTop: height * 0.02,
   },
   emailText: {
-    fontSize: 16,
+    fontSize: width * 0.05,
     color: '#333',
     fontWeight: '500',
   },
@@ -342,8 +324,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
-    paddingHorizontal: width * 0.20,
-    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.2,
+    paddingVertical: height * 0.02,
   },
   iconBottom: {
     width: width * 0.1,
@@ -355,15 +337,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   deleteButton: {
-    marginTop: 20,
-    padding: 10,
+    marginTop: height * 0.03,
+    padding: width * 0.04,
     backgroundColor: '#FF6347',
     borderRadius: 5,
     alignItems: 'center',
   },
   deleteButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
   },
 });

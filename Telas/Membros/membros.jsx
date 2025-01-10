@@ -113,7 +113,7 @@ const Membros = ({ navigation }) => {
 
         <View style={styles.separator} />
 
-        <TouchableOpacity onPress={openCamera}>
+        <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
           <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
 
@@ -128,13 +128,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#7ed758',
+    justifyContent: 'space-between',
+    paddingTop: height * 0.05, 
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
-    paddingHorizontal: width * 0.02,
+    paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.02,
   },
   logo: {
@@ -155,36 +157,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 20,
+    padding: width * 0.05,  
   },
   welcomeText: {
-    fontSize: width * 0.06,
+    fontSize: width * 0.05, 
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 20,
+    marginBottom: height * 0.03,  
   },
   memberList: {
-    paddingBottom: 20,
+    width: '100%', 
+    paddingBottom: height * 0.02,  
   },
   memberContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 50,
+    paddingVertical: height * 0.02,  
+    paddingHorizontal: width * 0.05, 
     backgroundColor: '#f0f0f0', 
     borderRadius: 10,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: '#d1d1d1', 
-    marginVertical: 8,
+    marginVertical: height * 0.01, 
+    width: '100%',  
   },
   memberEmail: {
-    fontSize: 16,
+    fontSize: width * 0.04,  
     color: '#000',
+    flex: 1, 
   },
   memberBadges: {
-    fontSize: 16,
+    fontSize: width * 0.04,  
     color: '#000',
+    flex: 1,  
+    textAlign: 'right', 
   },
   bottomBar: {
     flexDirection: 'row',
@@ -192,7 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#7ed758',
     paddingHorizontal: width * 0.05,
-    paddingVertical: height * 0.01,
+    paddingVertical: height * 0.02,
   },
   iconBottom: {
     width: width * 0.1,
@@ -204,4 +211,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
 });
+
 export default Membros;

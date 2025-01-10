@@ -3,13 +3,14 @@
     "name": "qrhunt",
     "slug": "qrhunt",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.qrhunt.qrhunt"
     },
     "android": {
       "package": "com.qrhunt.qrhunt"
     },
-    "plugins": [
+    "plugins": [ 
       "expo-barcode-scanner"
     ]
   }

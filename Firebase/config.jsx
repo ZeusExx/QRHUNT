@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAspADeHSl7L2NmnYwSKb2I13anIuS0FjA",
   authDomain: "qrhunt-001.firebaseapp.com",
   projectId: "qrhunt-001",
-  storageBucket: "qrhunt-001.appspot.com",
+  storageBucket: "qrhunt-001.appspot.com", 
   messagingSenderId: "337222098490",
   appId: "1:337222098490:web:0f0334dc10ac6b778a9f03",
   measurementId: "G-RGM86B2SKX"

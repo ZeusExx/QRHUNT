@@ -85,7 +85,7 @@ const Inventario = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.title}>QRHUNT</Text>
         <TouchableOpacity onPress={() => navigation.navigate('User')}>
-          <Image source={require('../../imgs/user.png')} style={styles.icon} />
+          <Image source={require('../../imgs/user.png')} style={styles.iconBottom} />
         </TouchableOpacity>
       </View>
 
@@ -116,7 +116,7 @@ const Inventario = ({ navigation }) => {
       <View style={styles.bottomBar}>
         <Image source={require('../../imgs/bau.png')} style={styles.iconBottom} />
         <View style={styles.separator} />
-        <TouchableOpacity onPress={openCamera}>
+        <TouchableOpacity onPress={() => navigation.navigate('QRScanner')}>
           <Image source={require('../../imgs/camera.png')} style={styles.iconBottom} />
         </TouchableOpacity>
         <View style={styles.separator} />
@@ -132,6 +132,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#7ed758',
+    justifyContent: 'space-between',
+    paddingTop: height * 0.05, 
   },
   topBar: {
     flexDirection: 'row',
@@ -150,9 +152,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  icon: {
-    width: width * 0.08,
-    height: width * 0.08,
+  iconBottom: {
+    width: width * 0.1,
+    height: width * 0.1,
   },
   content: {
     flexGrow: 1,

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../Firebase/config';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 import Mostra from '../../imgs/OnIcon.png';
 import Esconda from '../../imgs/OffIcon.png';
+
+const { width, height } = Dimensions.get('window');
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -25,25 +27,20 @@ const Login = () => {
     }, [error]);
 
     const handleLogin = async () => {
-        setError(null);
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             Alert.alert("Login feito com sucesso!");
             setEmail('');
             setPassword('');
-            setError(null);
             navigation.navigate('Inicio');
         } catch (err) {
+
             console.error('Erro durante o login:', err);
-            let errorMessage = 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
-            if (err.code === 'auth/invalid-email') {
-                errorMessage = 'Por favor, insira um e-mail válido.';
-            } else if (err.code === 'auth/wrong-password') {
-                errorMessage = 'Senha incorreta. Tente novamente.';
-            }
-            setError(errorMessage);
+
+            Alert.alert("Erro ao fazer login", "Verifique suas credenciais e tente novamente.");
         }
     };
+    
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -148,14 +145,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#5cb85c',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 16,
+        padding: width * 0.05,
     },
     logoContainer: {
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: height * 0.02,
     },
     logo: {
-        fontSize: 42, 
+        fontSize: width * 0.1, 
         fontWeight: 'bold',
         color: '#ffffff', 
         textShadowColor: '#000000', 
@@ -166,85 +163,85 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     logoImage: {
-        width: 150,
-        height: 150,
+        width: width * 0.4,
+        height: width * 0.4,
         marginTop: 10,
     },
     formContainer: {
         width: '100%',
         maxWidth: 400,
         borderRadius: 10,
-        padding: 10, // Espaço ajustado
+        padding: width * 0.04,
         elevation: 4,
         backgroundColor: '#5cb85c',
-        borderColor: '#a0a0a0', // Cor da borda
-        borderWidth: 1, // Largura da borda
-        shadowColor: '#000', // Cor da sombra
-        shadowOffset: { width: 0.8, height: 0.8 }, // Offset da sombra
-        shadowOpacity: 0.8, // Opacidade da sombra
+        borderColor: '#a0a0a0', 
+        borderWidth: 1, 
+        shadowColor: '#000', 
+        shadowOffset: { width: 0.8, height: 0.8 }, 
+        shadowOpacity: 0.8, 
         shadowRadius: 10, 
     },
     inputContainer: {
-        marginBottom: 12,
+        marginBottom: height * 0.02,
     },
     inputLabel: {
-        marginBottom: 2,
+        marginBottom: 5,
         color: 'black',
-        fontSize: 16,
+        fontSize: width * 0.04,
         textAlign: 'center',
     },
     inputWithIcon: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between', 
         borderColor: 'black',
         borderWidth: 1,
         borderRadius: 10,
-        paddingHorizontal: 8,
+        paddingHorizontal: width * 0.02,
         backgroundColor: '#ffffff',
+        width: '100%',  
     },
     input: {
         flex: 1,
-        height: 40,
-        fontSize: 14,
+        height: height * 0.07,  
+        fontSize: width * 0.04,
+        paddingVertical: height * 0.01, 
     },
     inputIcon: {
-        width: 20,
-        height: 20,
+        width: width * 0.07,
+        height: width * 0.07,
         tintColor: '#555555',
-        marginRight: 1,
+        marginRight: 5,
     },
     visibilityIcon: {
-        position: 'absolute',
-        right: 12,
         padding: 10,
     },
     visibilityIconImage: {
-        width: 20,
-        height: 20,
+        width: width * 0.06,
+        height: width * 0.06,
         tintColor: '#555555',
     },
     buttonContainer: {
         width: '100%',
-        marginTop: 20,
+        marginTop: height * 0.02,
     },
     loginButton: {
         backgroundColor: '#000000',
-        paddingVertical: 10,
+        paddingVertical: height * 0.02,
         borderRadius: 10,
         alignItems: 'center',
     },
     loginButtonText: {
-        fontSize: 16,
+        fontSize: width * 0.05,
         color: '#ffffff',
         fontWeight: 'bold',
     },
     registerLink: {
-        marginTop: 8,
+        marginTop: height * 0.01,
         alignItems: 'center',
     },
     registerLinkText: {
-        fontSize: 14,
+        fontSize: width * 0.04,
         color: '#000000',
         textDecorationLine: 'underline',
     },

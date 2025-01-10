@@ -17,7 +17,7 @@ Como Rodar o Projeto:
 
 Baixar as dependências:
 npm i
-
+ 
 Inicializar o aplicativo:
 npx expo start
 

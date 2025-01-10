@@ -9,7 +9,7 @@ import Inventario from './Telas/Inventario/Inventario';
 import User from './Telas/User/user';
 import Membros from './Telas/Membros/membros';
 import QRScanner from './Telas/QRScanner';
-
+ 
 
 const Stack = createStackNavigator();
 

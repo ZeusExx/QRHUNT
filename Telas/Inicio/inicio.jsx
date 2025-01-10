@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { Platform, View, Text, StyleSheet, Image, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Camera } from 'expo-camera'; 
@@ -96,6 +96,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#7ed758',
+    justifyContent: 'space-between',
+    paddingTop: height * 0.05, 
   },
   topBar: {
     flexDirection: 'row',
@@ -138,9 +140,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.07,
   },
   bottomBar: {
-    position: 'absolute',
-    left: 0,
-    bottom: 20, 
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -148,7 +147,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.01,
     width: '100%',
-  },
+    marginBottom: Platform.OS === 'ios' ? height * 0.02 : 0, 
+},
   iconBottom: {
     width: width * 0.1,
     height: width * 0.1,
